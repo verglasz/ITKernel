@@ -44,6 +44,32 @@
       "-O2",
       "-c",
       "-o",
+      "build/serial_io.c.o",
+      "src/serial_io.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/serial_io.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/serial_io.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/startup.c.o",
       "src/startup.c"
     ],
@@ -76,5 +102,57 @@
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/uart.c",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/uart.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/boot.S.o",
+      "src/boot.S"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/boot.S",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/boot.S.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/irq.S.o",
+      "src/irq.S"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/irq.S",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/irq.S.o"
   }
 ]
