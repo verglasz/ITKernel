@@ -1,0 +1,15 @@
+gcc
+-march=mips32r2
+-msoft-float
+-Wa,-msoft-float
+-G
+0
+-ffreestanding
+--sysroot=/opt/mcb32tools
+-I
+include
+-Wall
+-Wextra
+-Winline
+-O2
+
