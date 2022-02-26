@@ -38,10 +38,16 @@ PICOCOM_FTP ?= sendelf_crc32
 C_INCLUDE_PATH = "$(TOOLCHAIN_INSTALL_DIR)/include"
 SOME_LIBS = "$(TOOLCHAIN_INSTALL_DIR)/lib/proc"
 MORE_LIBS = "$(TOOLCHAIN_INSTALL_DIR)/lib"
-ASFLAGS = -march=mips32r2 -msoft-float
+ASFLAGS =
 CFLAGS = -march=mips32r2 -msoft-float -Wa,-msoft-float -G 0 -ffreestanding
-CFLAGS += --sysroot=$(TOOLCHAIN_INSTALL_DIR) -I$(INCLUDEDIR) -Wall -Wextra -Winline -O2
+CFLAGS += --sysroot=$(TOOLCHAIN_INSTALL_DIR) -I$(C_INCLUDE_PATH) -I$(INCLUDEDIR)
+CFLAGS += -Wall -Wextra -Winline -std=gnu17
 LDFLAGS = -T $(LINKSCRIPT) -lc -L $(SOME_LIBS) -L $(MORE_LIBS)
+
+# set NOOPT = 1 to disable optimization
+ifneq "$(NOOPT)" "1"
+	CFLAGS += -O2
+endif
 
 # Filenames
 ELFFILE = $(PROGNAME).elf
@@ -92,7 +98,7 @@ sendtar_crc32:
 	}
 
 disasm: envcheck
-	$(TARGET)objdump -d $(PROGNAME).elf > untracked/$(PROGNAME).elf.S
+	$(PREFIX)objdump -d $(PROGNAME).elf > untracked/$(PROGNAME).elf.S
 
 envcheck:
 	@echo "$(TARGET)" | grep mcb32 > /dev/null || (\
@@ -105,17 +111,17 @@ envcheck:
 		echo ""; \
 		exit 1)
 
-install: envcheck
-	$(TARGET)avrdude -v -p $(shell echo "$(DEVICE)" | tr '[:lower:]' '[:upper:]') -c stk500v2 -P "$(TTYDEV)" -b $(TTYBAUD) -U "flash:w:$(HEXFILE)"
+install: $(HEXFILE)
+	$(PREFIX)avrdude -v -p $(shell echo "$(DEVICE)" | tr '[:lower:]' '[:upper:]') -c stk500v2 -P "$(TTYDEV)" -b $(TTYBAUD) -U "flash:w:$(HEXFILE)"
+
+$(HEXFILE): $(ELFFILE) | envcheck
+	$(PREFIX)bin2hex -a $(ELFFILE)
 
 $(ELFFILE): $(OBJFILES) |  envcheck
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(HEXFILE): $(ELFFILE) | envcheck
-	$(TARGET)bin2hex -a $(ELFFILE)
-
 $(DEPDIR):
-	@mkdir $@
+	mkdir $@
 
 $(BUILDDIR):
 	mkdir $@
