@@ -16,6 +16,7 @@
 	.align 4
 	# the `vector_(new)_idx` sections are used by the linker
 	# to place the handlers in the proper spot
+	# for explanation of "ax",@progbits see top of file
 	.section .vector_new_\idx,"ax",@progbits
 	.global __vector_\idx
 	__vector_\idx:
@@ -36,13 +37,14 @@ _isr_loaders:
 	.set			i, i+1
 .endr
 
+.section .text
 # Default ISR
 .align 4
 .global _default_isr
 _default_isr:
 
 	# from what i understand we should have a shadow register set,
-	# but let's just save everything to be sure
+	# but let's just save everything to be sure and not worry about it
 	addi	$sp, $sp, -72
 	sw	$ra,  0($sp)
 	sw	$at,  4($sp)
@@ -98,7 +100,7 @@ _default_isr:
 
 
 # Handle exceptions (traps, syscalls, etc)
-# for explanation of "ax",@progbits see isr_stub
+# for explanation of "ax",@progbits see top of file
 .section .gen_handler,"ax",@progbits
 .ent _gen_exception
 _gen_exception:
