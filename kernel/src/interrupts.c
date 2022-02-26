@@ -1,12 +1,9 @@
 #include "types.h"
 
-u32 sp_savemem;
-
-void default_isr(u32 irq_number) {
+void interrupt_handler(u32 raw_irq_number) {
     return;
 }
 
-void general_exception(u32 cause) {
+void exception_handler(u32 raw_cause) {
     return;
 }
-
