@@ -1,0 +1,4 @@
+
+#define CORE_CLOCK_FREQ (80 * 1000 * 1000)
+#define PERIPH_CLOCK_FREQ (CORE_CLOCK_FREQ / 2)
+
