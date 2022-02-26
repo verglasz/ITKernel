@@ -1,4 +1,5 @@
 gcc
+--gcc-toolchain=/opt/mcb32tools
 -march=mips32r2
 -msoft-float
 -Wa,-msoft-float
@@ -11,5 +12,5 @@ include
 -Wall
 -Wextra
 -Winline
--O2
+-std=gnu99
 
