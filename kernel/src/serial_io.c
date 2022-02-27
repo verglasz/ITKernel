@@ -1,11 +1,11 @@
 
+#include "serial_io.h"
+
 #include "uart.h"
 
 #include <stdio.h>
 
-#define PRINTF_BUFSIZE 1 * 1024
-#define ATTRIBUTE_PRINTF_1 \
-    __attribute__((__format__(__printf__, 1, 2))) __attribute__((__nonnull__(1)))
+#define PRINTF_BUFSIZE (1 * 1024)
 
 FILE *const stdout;
 
@@ -26,7 +26,7 @@ int serial_printf(const char *fmt, ...) {
     if (written < 0) return EFMT;
     if (written > PRINTF_BUFSIZE) return ENOSPACE;
 
-    uart_write_n(buffer, written);
+    uart_write_n((u8 *)buffer, written);
 
     return written;
 }

@@ -62,6 +62,16 @@ static void setup_peripherals() {
     SYSKEY = 0x0;                        // Lock OSCCON
 }
 
+/* Configure cpu and interrupt controller
+ * for vectored interrupts
+ */
 static void setup_interrupts() {
-    return;
+    usize cause = 0;
+    __asm__("mfc0	%0, $13, 0" : "=r"(cause));       // read Cause register
+    cause |= 0x00800000;                              // interrupts to special interrupt vectors
+    __asm__("mtc0	%0, $13, 0\n" ::"r"(cause));      // write Cause register
+    __asm__("mtc0	%0, $12, 1\n" ::"r"(0x1 << 5));   // write IntCtl register (vector spacing)
+    __asm__("mtc0	%0, $15, 1\n" ::"r"(0x9d001000)); // write Ebase
+    __asm__("ehb");
+    INTCON = PIC32_INTCON_MVEC | (0x4 << 16); // enable multi-vector and set vector spacing
 }
