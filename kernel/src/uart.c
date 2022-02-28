@@ -63,7 +63,17 @@ void uart_setup() {
  */
 void uart_write_n(const u8 *buffer, usize len) {
     for (usize i = 0; i < len; i++) {
-        while (U1STA & PIC32_USTA_UTXBF) {} // wait for space in the buffer
+        while (U1STA & PIC32_USTA_UTXBF) {} // wait for space in the tx buffer
         U1TXREG = buffer[i];
+    }
+}
+
+/*  read `len` bytes from uart rx buffers to provided char buffer,
+ * `buffer` MUST be a valid pointer to at least `len` bytes of usable memory
+ */
+void uart_direct_read_n(u8 *buffer, usize len) {
+    for (usize i = 0; i < len; i++) {
+        while (!(U1STA & PIC32_USTA_URXDA)) {}
+        buffer[i] = U1RXREG;
     }
 }
