@@ -1,3 +1,4 @@
+#include "interrupts.h"
 #include "led_signals.h"
 #include "types.h"
 
@@ -22,6 +23,7 @@ void startup(void *stack_pointer) {
     PORTE = LED_SIGBOOT;
     init();
     PORTECLR = 0xff;
+    enable_interrupts();
     main_loop();
     for (;;) {}
 }
@@ -66,7 +68,7 @@ static void setup_peripherals() {
  * for vectored interrupts
  */
 static void setup_interrupts() {
-    usize cause = 0;
+    usize cause;
     __asm__("mfc0	%0, $13, 0" : "=r"(cause));       // read Cause register
     cause |= 0x00800000;                              // interrupts to special interrupt vectors
     __asm__("mtc0	%0, $13, 0\n" ::"r"(cause));      // write Cause register
