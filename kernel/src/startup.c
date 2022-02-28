@@ -1,6 +1,9 @@
+#include "i2c.h"
 #include "interrupts.h"
 #include "led_signals.h"
+#include "serial_io.h"
 #include "types.h"
+#include "uart.h"
 
 #include <pic32mx.h>
 
@@ -28,7 +31,15 @@ void startup(void *stack_pointer) {
     for (;;) {}
 }
 
-static void main_loop() {}
+static void main_loop() {
+    serial_printf("Hello from the other si... ITKernel\r\n");
+    for (;;) {
+        serial_printf("Tell me something...\r\n");
+        char linebuf[200];
+        serial_gets_s(linebuf, 200);
+        serial_printf("I heard `%s`\r\n", linebuf);
+    }
+}
 
 static void init() {
     setup_gpio();
@@ -62,6 +73,8 @@ static void setup_peripherals() {
     while (OSCCON & (1 << 21)) {}        // Wait until PBDIV ready
     OSCCONSET = PIC32_OSCCON_PBDIV_2;    // Set PBCLK to 40MHz (divisor 2)
     SYSKEY = 0x0;                        // Lock OSCCON
+    i2c_setup();
+    uart_setup();
 }
 
 /* Configure cpu and interrupt controller

@@ -9,14 +9,15 @@
 
 FILE *const stdout;
 
-/* print to serial output
+/* printf to serial output
  * (attribute to get the compiler to check that args are consistent with format string)
+ * return number of bytes written
  */
 ATTRIBUTE_PRINTF_1
-int serial_printf(const char *fmt, ...) {
+isize serial_printf(const char *fmt, ...) {
     char buffer[PRINTF_BUFSIZE];
     va_list ap;
-    int written;
+    isize written;
 
     va_start(ap, fmt);
     written =
@@ -29,4 +30,20 @@ int serial_printf(const char *fmt, ...) {
     uart_write_n((u8 *)buffer, written);
 
     return written;
+}
+
+/* Read string from serial input into buf,
+ * stopping when a newline or null byte is encountered
+ * or when len-1 bytes have been read; null-terminate the string.
+ * Return number of bytes read (max len-1)
+ */
+usize serial_gets_s(char *buf, usize len) {
+    isize read = 0;
+    while (read < len) {
+        uart_direct_read_n((u8 *)(buf + read), 1);
+        read++;
+        if (buf[read] == '\0' | buf[read] == '\n') break;
+    }
+    buf[read + 1] = '\0';
+    return read;
 }
