@@ -40,10 +40,29 @@ _isr_trampolines:
 .section .gen_handler,"ax",@progbits
 .ent _gen_exception
 _gen_exception:
-	addi	$k0, $zero, 0 # mark as exception
-	mfc0	$k1, $13, 0
+	mfc0	$k1, $13, 0	# read Cause register
+	andi	$k0, $k1, 0x7d	# mask out cause bits
+	xori	$k0, $k0, 0x20	# compare to cause Syscall
+	beqz	$k0, _syscall   # if it's a syscall don't go to main landing pad (no need to save regs)
+	addi	$k0, $zero, 0   # mark as exception
 	j	_trap_landing_pad
 	nop
+_syscall:
+#	addi	$k0, $sp, 0
+	# use kernel stack (syscalls always come from userspace)
+#	lw	$sp, kernel_sp
+	jal	syscall_handler
+	nop
+#	addi	$sp, $k0, 0	# restore user stack
+	mfc0	$k0, $14, 0	# advance instruction pointer (skip syscall)
+	addi	$k0, $k0, 4 # maybe we should check if we were in MIPS16e mode?
+	# i think it's also legal per misp spec to have syscall in a delay slot,
+	# but we just declare that we don't support user programs that do it
+	mtc0	$k0, $14, 0
+	ehb	# actually eret shoud clear the hazards itself?
+	eret
+	nop
+
 .end _gen_exception
 
 
@@ -81,23 +100,35 @@ _trap_landing_pad:
 	sw	$v1, 12($sp)
 	sw	$v0,  8($sp)
 
-	beq	$k0, $zero, exception
+	addi	$at, $k0, 0	# caller-saved registers have been saved so we can use them
 	addi	$a0, $k1, 0	# use interrupt number/cause as argument
+
+#	mfc0	$k1, $12, 0	# read status register
+#	andi	$k1, $k1, 0x10	# get User Mode bit
+#	beqz	$k1, _was_kernel	# if we come from kernel mode keep going
+#	addi	$k0, $sp, 0		# else if we were in user mode,
+#	lw	$sp, kernel_sp		# switch to kernel stack
+_was_kernel:
+	beqz	$at, _exception
+	nop
 	jal	interrupt_handler
 	nop
-	b	continue
+	b	_continue
 	nop
-exception:
+_exception:
 	jal	exception_handler
 	nop
 
 	# Go to next instruction
 	mfc0	$k0, $14, 0
 	addi	$k0, $k0, 4 # maybe we should check if we were in MIPS16e mode?
+	# also i'm pretty sure we should check if we're in a delay slot...
 	mtc0	$k0, $14, 0
 	ehb
 
-continue:
+_continue:
+#	addi	$sp, $k0, 0	# unconditionally restore the stack,
+				# since at worst it's a no-op
 	lw	$ra,  76($sp)
 	lw	$at,  72($sp)
 
