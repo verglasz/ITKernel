@@ -17,6 +17,8 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/interrupts.c.o",
       "src/interrupts.c"
@@ -43,6 +45,8 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/serial_io.c.o",
       "src/serial_io.c"
@@ -69,6 +73,8 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/startup.c.o",
       "src/startup.c"
@@ -95,6 +101,8 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/uart.c.o",
       "src/uart.c"
@@ -121,6 +129,8 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/boot.S.o",
       "src/boot.S"
@@ -147,6 +157,36 @@
       "-std=gnu17",
       "-O2",
       "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
+      "-o",
+      "build/delay.S.o",
+      "src/delay.S"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/delay.S",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/delay.S.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-I",
+      "\"/opt/mcb32tools/include\"",
       "-o",
       "build/irq.S.o",
       "src/irq.S"
