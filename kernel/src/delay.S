@@ -1,9 +1,10 @@
 
 .section .text
+.set noreorder
 
 .global delay
 delay:
 	bgtz	$a0, delay
-	nop
+	addi	$a0, $a0, -1
 	jr	$ra
 
