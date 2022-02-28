@@ -31,7 +31,7 @@ SOURCEDIR := src
 BUILDDIR := build
 
 # File transfer program
-PICOCOM_FTP ?= sendelf_crc32
+# PICOCOM_FTP ?= sendelf_crc32
 # PICOCOM_FTP ?= sendtar_crc32
 
 # Compiler and linker flags
@@ -79,7 +79,7 @@ clean:
 	$(RM) -rf $(DEPDIR)
 
 picocom:
-	picocom -b 19200 -y n --send-cmd "./helpers/$(PICOCOM_FTP)" $(TTYDEV)
+	picocom -b 19200 --parity n --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
 
 sendelf_crc32:
 	gcc -Wall -Wextra -o helpers/sendelf_crc32 helpers/sendelf_crc32.c;
