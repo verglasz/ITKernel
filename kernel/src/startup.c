@@ -4,10 +4,10 @@
 #include "serial_io.h"
 #include "types.h"
 #include "uart.h"
+#include "kernel.h"
 
 #include <pic32mx.h>
 
-static void main_loop();
 static void init();
 static void setup_memory();
 static void setup_gpio();
@@ -27,18 +27,8 @@ void startup(void *stack_pointer) {
     init();
     PORTECLR = 0xff;
     enable_interrupts();
-    main_loop();
+    kmain();
     for (;;) {}
-}
-
-static void main_loop() {
-    serial_printf("Hello from the other si... ITKernel\r\n");
-    for (;;) {
-        serial_printf("Tell me something...\r\n");
-        char linebuf[200];
-        serial_gets_s(linebuf, 200);
-        serial_printf("I heard `%s`\r\n", linebuf);
-    }
 }
 
 static void init() {
@@ -90,3 +80,4 @@ static void setup_interrupts() {
     __asm__("ehb");
     INTCON = PIC32_INTCON_MVEC | (0x4 << 16); // enable multi-vector and set vector spacing
 }
+
