@@ -1,6 +1,7 @@
 
 #pragma once
 #include "types.h"
+#include <pic32mx.h>
 
 
 static __inline__ u8 getsws() {
