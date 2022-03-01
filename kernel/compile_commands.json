@@ -44,6 +44,32 @@
       "-O2",
       "-c",
       "-o",
+      "build/eeprom.c.o",
+      "src/eeprom.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/eeprom.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/eeprom.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/i2c.c.o",
       "src/i2c.c"
     ],

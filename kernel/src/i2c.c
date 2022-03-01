@@ -1,8 +1,5 @@
 #include "i2c.h"
 
-#include "common.h"
-#include "types.h"
-
 #include <pic32mx.h>
 
 #define IFS_I2C1M (0x80000000u) //  1<<31, bit in IFS0 for i2c1 master events
@@ -49,14 +46,19 @@ static void _wait_until_ready(u32 extra_statflags) {
 /* wait until the interrupt flag associated with master events is set,
  * then clear it
  */
-static void _wait_and_clear_if() {
+static __inline__ void _wait_and_clear_if() {
     while (!(IFS(0) & IFS_I2C1M)) {} // wait for interrupt signalling completed event
     IFSCLR(0) = IFS_I2C1M;           // clear i2c master event interrupt flag
 }
 
-static void _send_ack() {
+static __inline__ void _send_ack() {
     _wait_until_ready(0);
     I2C1CONCLR = PIC32_I2CCON_ACKDT;
+    I2C1CONSET = PIC32_I2CCON_ACKEN;
+}
+static __inline__ void _send_nack() {
+    _wait_until_ready(0);
+    I2C1CONSET = PIC32_I2CCON_ACKDT;
     I2C1CONSET = PIC32_I2CCON_ACKEN;
 }
 
@@ -64,6 +66,13 @@ void i2c_start() {
     _wait_until_ready(0);
     IFSCLR(0) = IFS_I2C1M;         // clear i2c master event interrupt flag
     I2C1CONSET = PIC32_I2CCON_SEN; // begin start event
+    _wait_and_clear_if();
+}
+
+void i2c_restart() {
+    _wait_until_ready(0);
+    IFSCLR(0) = IFS_I2C1M;          // clear i2c master event interrupt flag
+    I2C1CONSET = PIC32_I2CCON_RSEN; // begin start event
     _wait_and_clear_if();
 }
 
@@ -88,13 +97,17 @@ AckStatus i2c_send(u8 byte) {
 /* Receive single byte over i2c.
  * Must be called after starting transmission with i2c_start
  */
-u8 i2c_receive() {
+u8 i2c_receive(AckStatus ack) {
     if (I2C1STAT & PIC32_I2CSTAT_RBF) { // if there's data in the receive buffer, use it
         return I2C1RCV;
     }
     _wait_until_ready(0);
     I2C1CONSET = PIC32_I2CCON_RCEN;
-    while (!(I2C1STAT & PIC32_I2CSTAT_RBF)) {}
-    _send_ack();
+    while (!(I2C1STAT & PIC32_I2CSTAT_RBF)) {} // wait for data in the buffer
+    if (ack == I2C_NACK) {
+        _send_nack();
+    } else {
+        _send_ack();
+    }
     return I2C1RCV;
 }
