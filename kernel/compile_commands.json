@@ -70,6 +70,58 @@
       "-O2",
       "-c",
       "-o",
+      "build/elf.c.o",
+      "src/elf.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/elf.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/elf.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/gpio.c.o",
+      "src/gpio.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/gpio.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/gpio.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/i2c.c.o",
       "src/i2c.c"
     ],
@@ -122,6 +174,32 @@
       "-O2",
       "-c",
       "-o",
+      "build/kernel.c.o",
+      "src/kernel.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/kernel.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/kernel.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/serial_io.c.o",
       "src/serial_io.c"
     ],
@@ -154,6 +232,32 @@
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/startup.c",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/startup.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/syscalls.c.o",
+      "src/syscalls.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/syscalls.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/syscalls.c.o"
   },
   {
     "arguments": [
@@ -232,5 +336,31 @@
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/irq.S",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/irq.S.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/kernel.S.o",
+      "src/kernel.S"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/kernel.S",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/kernel.S.o"
   }
 ]
