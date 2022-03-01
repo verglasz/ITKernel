@@ -34,15 +34,16 @@ isize serial_printf(const char *fmt, ...) {
 
 /* Read string from serial input into buf,
  * stopping when a newline or null byte is encountered
- * or when len-1 bytes have been read; null-terminate the string.
+ * or when len-1 bytes have been read;
+ * then null-terminate the string.
  * Return number of bytes read (max len-1)
  */
 usize serial_gets_s(char *buf, usize len) {
     isize read = 0;
     while (read < len) {
-        uart_direct_read_n((u8 *)(buf + read), 1);
-        read++;
+        uart_direct_read_n((u8 *)&buf[read], 1);
         if (buf[read] == '\0' | buf[read] == '\n') break;
+        read++;
     }
     buf[read + 1] = '\0';
     return read;
