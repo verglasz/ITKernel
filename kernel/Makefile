@@ -15,11 +15,18 @@ CPP=$(PREFIX)cpp
 DEVICE		= 32MX340F512H
 
 # UART settings for programmer
-TTYDEV		?=/dev/ttyS3
+ifeq "$(shell hostname)" "helium"
+	TTYDEV		=/dev/ttyUSB0
+else
+	TTYDEV		=/dev/ttyS3
+endif
 TTYBAUD		?=115200
 
 # Name of the project
 PROGNAME = kernel
+
+
+COM_FLAGS = -b 19200 --parity n --omap lfcrlf --imap igncr,lfcrlf,spchex,8bithex # --emap nrmhex,spchex,8bithex --echo
 
 # Linkscript
 # LINKSCRIPT	:= p$(shell echo "$(DEVICE)" | tr '[:upper:]' '[:lower:]').ld
@@ -41,7 +48,7 @@ MORE_LIBS = $(TOOLCHAIN_INSTALL_DIR)/lib
 ASFLAGS =
 CFLAGS = -march=mips32r2 -msoft-float -Wa,-msoft-float -G 0 -ffreestanding
 CFLAGS += -I$(C_INCLUDE_PATH) -I$(INCLUDEDIR)
-CFLAGS += -Wall -Wextra -Winline -std=c99
+CFLAGS += -Wall -Wextra -Winline -std=gnu17
 LDFLAGS = -T $(LINKSCRIPT) -L $(SOME_LIBS) -L $(MORE_LIBS) -lc
 
 # set NOOPT = 1 to disable optimization
@@ -71,6 +78,7 @@ df = $(DEPDIR)/$(*F)
 .SUFFIXES:
 
 all: $(HEXFILE)
+	echo "${HOST}"
 
 clean:
 	$(RM) helpers/sendelf_crc32
@@ -79,7 +87,7 @@ clean:
 	$(RM) -rf $(DEPDIR)
 
 picocom:
-	picocom -b 19200 --parity n --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
+	picocom $(COM_FLAGS) --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
 
 sendelf_crc32:
 	gcc -Wall -Wextra -o helpers/sendelf_crc32 helpers/sendelf_crc32.c;
@@ -91,7 +99,7 @@ disasm: $(ELFFILE)
 	$(PREFIX)objdump -d $< > untracked/$(PROGNAME).dis.S
 
 install: $(HEXFILE)
-	$(PREFIX)avrdude -v -p $(shell echo "$(DEVICE)" | tr '[:lower:]' '[:upper:]') -c stk500v2 -P "$(TTYDEV)" -b $(TTYBAUD) -U "flash:w:$(HEXFILE)"
+	$(PREFIX)avrdude -V -p $(shell echo "$(DEVICE)" | tr '[:lower:]' '[:upper:]') -c stk500v2 -P "$(TTYDEV)" -b $(TTYBAUD) -U "flash:w:$(HEXFILE)"
 
 $(HEXFILE): $(ELFFILE)
 	$(PREFIX)bin2hex -a $(ELFFILE)

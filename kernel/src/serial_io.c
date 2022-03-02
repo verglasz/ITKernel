@@ -40,7 +40,7 @@ isize serial_printf(const char *fmt, ...) {
  */
 usize serial_gets_s(char *buf, usize len) {
     isize read = 0;
-    while (read < len) {
+    while (read < len - 1) {
         uart_direct_read_n((u8 *)&buf[read], 1);
         if (buf[read] == '\0' | buf[read] == '\n') break;
         read++;
@@ -48,4 +48,3 @@ usize serial_gets_s(char *buf, usize len) {
     buf[read + 1] = '\0';
     return read;
 }
-

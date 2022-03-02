@@ -5,6 +5,7 @@
 #include "uart.h"
 
 #include "common.h"
+#include "led_signals.h"
 
 #include <pic32mx.h>
 #include <stddef.h>
@@ -62,18 +63,24 @@ void uart_setup() {
  * `buffer` MUST be a valid pointer to at least `len` bytes of valid memory
  */
 void uart_write_n(const u8 *buffer, usize len) {
+    LED_DEBUG(LED_UART_WRITE_START);
     for (usize i = 0; i < len; i++) {
         while (U1STA & PIC32_USTA_UTXBF) {} // wait for space in the tx buffer
+        LED_DEBUG(LED_UART_WRITE_PUT1);
         U1TXREG = buffer[i];
     }
+    LED_DEBUG(LED_UART_WRITE_DONE);
 }
 
 /*  read `len` bytes from uart rx buffers to provided char buffer,
  * `buffer` MUST be a valid pointer to at least `len` bytes of usable memory
  */
 void uart_direct_read_n(u8 *buffer, usize len) {
+    LED_DEBUG(LED_UART_READ_START);
     for (usize i = 0; i < len; i++) {
         while (!(U1STA & PIC32_USTA_URXDA)) {}
+        LED_DEBUG(LED_UART_READ_GOT1);
         buffer[i] = U1RXREG;
     }
+    LED_DEBUG(LED_UART_READ_DONE);
 }

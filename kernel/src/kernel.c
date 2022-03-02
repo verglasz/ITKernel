@@ -2,7 +2,9 @@
 #include "kernel.h"
 
 #include "display.h"
+#include "led_signals.h"
 #include "serial_io.h"
+#include "uart.h"
 
 struct context_t {
     usize sp;
@@ -38,10 +40,13 @@ void set_user_mode() {
 }
 
 void kmain() {
+    LED_DEBUG(LED_KMAIN);
     kernel_ctx.data = 0;
     kernel_ctx.epc = 0;
     serial_printf("Hello from the other si... ITKernel\n");
+    LED_DEBUG(LED_SERIAL_PRINT);
     isize ret = setjmp(&kernel_ctx);
+    LED_DEBUG(LED_SETJMP);
     if (ret == 0) { // first return
         serial_printf("jump point set\n");
     } else { // return from longjmp
@@ -50,11 +55,17 @@ void kmain() {
     }
 
     display_string(0, "Test with text!");
-    display_update();
+    LED_DEBUG(LED_SCREEN_PRINT);
+    /* display_update(); */
+    LED_DEBUG(LED_SCREEN_FLUSH);
     for (;;) {
         serial_printf("Tell me something...\n");
+        LED_DEBUG(LED_WAIT_ECHO);
         char linebuf[200];
         serial_gets_s(linebuf, 200);
+        LED_DEBUG(LED_GOT_ECHO);
         serial_printf("I heard `%s`\n", linebuf);
+        uart_direct_read_n(linebuf, 200);
+        uart_write_n(linebuf, 200);
     }
 }

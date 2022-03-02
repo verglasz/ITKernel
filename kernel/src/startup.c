@@ -27,15 +27,20 @@ void startup(void *stack_pointer) {
     LED_DEBUG(LED_BOOT);
     init();
     enable_interrupts();
+    LED_DEBUG(LED_INIT_INTEN);
     kmain();
     for (;;) {}
 }
 
 static void init() {
     setup_gpio();
+    LED_DEBUG(LED_INIT_GPIO);
     setup_memory();
+    LED_DEBUG(LED_INIT_MEM);
     setup_peripherals();
+    LED_DEBUG(LED_INIT_PERIPH);
     setup_interrupts();
+    LED_DEBUG(LED_INIT_INTS);
 }
 
 static void setup_gpio() {
@@ -71,8 +76,11 @@ static void setup_peripherals() {
     OSCCONSET = PIC32_OSCCON_PBDIV_2;    // Set PBCLK to 40MHz (divisor 2)
     SYSKEY = 0x0;                        // Lock OSCCON
     i2c_setup();
+    LED_DEBUG(LED_INIT_I2C);
     uart_setup();
-    display_init();
+    LED_DEBUG(LED_INIT_UART);
+    /* display_init(); */
+    LED_DEBUG(LED_INIT_DISPL);
 }
 
 /* Configure cpu and interrupt controller
