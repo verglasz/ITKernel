@@ -20,7 +20,7 @@ typedef struct {
     u8 buffer[UART_BUFFER_SIZE];
 } RingBuffer;
 
-static RingBuffer rx_buffer;
+volatile static RingBuffer rx_buffer;
 
 typedef enum {
     UART_NONE = 0,
@@ -72,12 +72,22 @@ void uart_write_n(const u8 *buffer, usize len) {
     LED_DEBUG(LED_UART_WRITE_DONE);
 }
 
+u8 uart_read_byte() {
+    while (rx_buffer.head == rx_buffer.tail) {}
+    u8 ret = rx_buffer.buffer[rx_buffer.head];
+    uart_interrupt_disable(UART_ALL);
+    rx_buffer.head = (rx_buffer.head + 1) % UART_BUFFER_SIZE;
+    uart_interrupt_enable(UART_RX);
+    return ret;
+}
+
 /*  read `len` bytes from uart rx buffers to provided char buffer,
  * `buffer` MUST be a valid pointer to at least `len` bytes of usable memory
  */
 void uart_direct_read_n(u8 *buffer, usize len) {
     LED_DEBUG(LED_UART_READ_START);
     for (usize i = 0; i < len; i++) {
+        if (!(U1STA & PIC32_USTA_URXDA)) { U1STACLR = PIC32_USTA_OERR; }
         while (!(U1STA & PIC32_USTA_URXDA)) {}
         LED_DEBUG(LED_UART_READ_GOT1);
         buffer[i] = U1RXREG;

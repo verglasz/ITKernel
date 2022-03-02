@@ -26,7 +26,7 @@ TTYBAUD		?=115200
 PROGNAME = kernel
 
 
-COM_FLAGS = -b 19200 --parity n --omap lfcrlf --imap igncr,lfcrlf,spchex,8bithex # --emap nrmhex,spchex,8bithex --echo
+COM_FLAGS = -b 19200 --parity n --omap crlf --imap igncr,lfcrlf,spchex,8bithex # --emap nrmhex,spchex,8bithex --echo
 
 # Linkscript
 # LINKSCRIPT	:= p$(shell echo "$(DEVICE)" | tr '[:upper:]' '[:lower:]').ld

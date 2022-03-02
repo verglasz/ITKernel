@@ -56,8 +56,9 @@ void kmain() {
 
     display_string(0, "Test with text!");
     LED_DEBUG(LED_SCREEN_PRINT);
-    /* display_update(); */
+    display_update();
     LED_DEBUG(LED_SCREEN_FLUSH);
+    serial_printf("In display textbuffer[0]: `%s`...\n", textbuffer[0]);
     for (;;) {
         serial_printf("Tell me something...\n");
         LED_DEBUG(LED_WAIT_ECHO);
