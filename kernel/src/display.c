@@ -160,7 +160,7 @@ void display_clear(void) {
         displaybuffer[i] = 0;
 }
 
-static void spi2init(void) {
+void spi2init(void) {
 
     // Reset config and clear SPI buffer
     SPI2CON = 0;
@@ -179,6 +179,23 @@ static void spi2init(void) {
 
 
 void display_init(void) {
+
+	/*
+	Vdd = RF6
+	VBAT_en = RF5
+	Command Select = RF4
+
+	Reset = RD9
+	*/
+	// Set the pins for the display
+	PORTFSET = (1 << 4) | (1 << 5) | (1 << 6); //RF4 to RF6 to high
+	TRISFCLR = (1 << 4) | (1 << 5) | (1 << 6); //RF4 to RF6 set to outputs
+
+	// Set the reset pin
+	PORTDSET = (1 << 9) // RD9 (reset pin) set to high
+	TRISDCLR = (1 << 9) // RD9 set to output
+
+
 	/*
 	Power on sequence:
 		1. Apply power to VDD.
