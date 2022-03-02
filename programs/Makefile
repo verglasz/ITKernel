@@ -30,8 +30,8 @@ PROGDIR := progs
 LIBDIR := itklibc
 
 # File transfer program
-# PICOCOM_FTP ?= sendelf_crc32
-# PICOCOM_FTP ?= sendtar_crc32
+# PICOCOM_FTP ?= utils/sendelf_crc32
+# PICOCOM_FTP ?= utils/sendtar_crc32
 
 # Compiler and linker flags
 C_INCLUDE_PATH = "$(TOOLCHAIN_INSTALL_DIR)/include"
@@ -41,7 +41,12 @@ ASFLAGS =
 CFLAGS = -march=mips32r2 -msoft-float -Wa,-msoft-float -G 0 -ffreestanding
 CFLAGS += --sysroot=$(TOOLCHAIN_INSTALL_DIR) -I$(C_INCLUDE_PATH) -I$(INCLUDEDIR)
 CFLAGS += -Wall -Wextra -Winline -std=gnu17
-LDFLAGS = -T $(LINKSCRIPT) -L $(SOME_LIBS) -L $(MORE_LIBS) -lc -z max-page-size=8
+# setting max-page-size avoids aligning things to 4k page boundaries in the linked elf,
+# since we aren't memmapping it or anything
+# but just straight up copying it in memory mostly byte by byte, it should make no difference
+# we shouldn't really need more than 4 bytes alignment but let's make it 16 for good measure
+# (this is absolutely necessary to get size down to something reasonable)
+LDFLAGS = -T $(LINKSCRIPT) -L $(SOME_LIBS) -L $(MORE_LIBS) -lc -z max-page-size=16
 
 # set NOOPT = 1 to disable optimization
 ifneq "$(NOOPT)" "1"
@@ -61,12 +66,8 @@ HEXFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.hex,$(PROGFILES))
 OBJFILES =  $(patsubst $(LIBDIR)/%.c,$(BUILDDIR)/$(LIBDIR)/%.c.o,$(LIBFILES))
 OBJFILES +=  $(patsubst $(LIBDIR)/%.S,$(BUILDDIR)/$(LIBDIR)/%.S.o,$(ASLIBFILES))
 
-# Hidden directory for dependency file
-DEPDIR = .deps
-df = $(DEPDIR)/$(*F)
 
-
-.PHONY: all lib progs progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
+.PHONY: all lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
 .SUFFIXES:
 
 
@@ -87,14 +88,16 @@ clean:
 	$(RM) -rf $(HEXFILES)
 	$(RM) -rf $(OBJFILES)
 
-picocom:
+picocom: helpers
 	picocom -b 19200 --parity n --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
 
+helpers: sendelf_crc32 sendtar_crc32
+
 sendelf_crc32:
-	gcc -Wall -Wextra -o helpers/sendelf_crc32 helpers/sendelf_crc32.c;
+	gcc -Wall -Wextra -o utils/sendelf_crc32 utils/sendelf_crc32.c;
 
 sendtar_crc32:
-	gcc -Wall -Wextra -o helpers/sendtar_crc32 helpers/sendtar_crc32.c;
+	gcc -Wall -Wextra -o utils/sendtar_crc32 utils/sendtar_crc32.c;
 
 $(BUILDDIR)/%.elf.stripped: $(BUILDDIR)/%.elf | stripcheck
 	cp $< $@

@@ -100,7 +100,7 @@ _imageExecutionJumpToFirstInFlash   = 0x02000000 ;  /* the bootloader will jump 
  *
  *************************************************************************/
  _IMAGE_TYPE            = _imageMPIDE | _imageJustInTimeFlashErase | _imageExecutionJumpAddress;
- _IMAGE_FLASH_SIZE      = LENGTH(exception_mem) + LENGTH(kuseg_program_mem);
+ _IMAGE_FLASH_SIZE      = 0x1000 + LENGTH(kuseg_program_mem);
 _JUMP_ADDR              = _START_ADDR;
 
 /*INPUT("crt0.o") */ /* our pathetic excuse for a libc takes care of that */
