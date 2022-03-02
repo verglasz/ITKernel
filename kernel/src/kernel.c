@@ -1,6 +1,7 @@
 
 #include "kernel.h"
 
+#include "display.h"
 #include "serial_io.h"
 
 struct context_t {
@@ -47,6 +48,9 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
+
+    display_string(0, "Test with text!");
+    display_update();
     for (;;) {
         serial_printf("Tell me something...\n");
         char linebuf[200];

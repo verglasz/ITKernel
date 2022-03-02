@@ -48,3 +48,4 @@ usize serial_gets_s(char *buf, usize len) {
     buf[read + 1] = '\0';
     return read;
 }
+
