@@ -80,7 +80,6 @@ static void setup_peripherals() {
     LED_DEBUG(LED_INIT_I2C);
     uart_setup();
     LED_DEBUG(LED_INIT_UART);
-    spi2init();
     LED_DEBUG(LED_INIT_SPI);
     display_init();
     LED_DEBUG(LED_INIT_DISPL);

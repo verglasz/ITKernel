@@ -27,5 +27,4 @@ void display_string(uint8_t x, uint8_t y, const char *text);
 void display_string_inverted(uint8_t x, uint8_t y, const char *text);
 void display_update();
 void display_init();
-void spi2init();
 

@@ -6,6 +6,7 @@
 #include "display.h" /* Declarations for this file. */
 #include "led_signals.h"
 #include "types.h"
+#include "serial_io.h"
 
 // buffers
 u8 displaybuffer[DISPLAY_BUFFER_SIZE];
@@ -128,15 +129,23 @@ void display_pins_init(void) {
 
     // Set the reset pin
     PORTGSET = (1 << 9); // RG9 (reset pin) set to high
-    TRISDCLR = (1 << 9); // RG9 set to output
+    TRISGCLR = (1 << 9); // RG9 set to output
 }
 
 
 void display_init(void) {
-    
+	serial_printf("Running display_init\n");
+
+    serial_printf("> Running spi2init\n");
 	spi2init();
+
+	serial_printf("> Running display_pins_init\n");
 	display_pins_init();
 	
+	serial_printf("> Clearing displaybuffer\n");
+	display_clear();
+
+	serial_printf("> Running remaining of display_init\n");
 	/*
     Power on sequence:
         1. Apply power to VDD.
@@ -150,17 +159,17 @@ void display_init(void) {
 
     DISPLAY_CHANGE_TO_COMMAND_MODE;
     // Startup sequence
-    delay(100);
+    delay(10000);
     DISPLAY_ACTIVATE_VDD;
-    delay(100000000);
+    delay(1000000);
     // Turn display off
     spi_send_recv(0xAE);
 
     // Bring reset low, wait for driver to reset then turn reset high.
     DISPLAY_ACTIVATE_RESET;
-    delay(100);
+    delay(10000);
     DISPLAY_DO_NOT_RESET;
-    delay(100);
+    delay(10000);
     // End of startup sequence
 
     // Charge pump setting
@@ -173,7 +182,7 @@ void display_init(void) {
     spi_send_recv(0xF1);
 
     DISPLAY_ACTIVATE_VBAT;
-    delay(100000000);
+    delay(10000);
 
     // Sets the mapping to display data column adress (Put origin in top-left corner)
     spi_send_recv(0xA1);
@@ -186,6 +195,9 @@ void display_init(void) {
 
     // Turn on screen (0xAF for normal mode) | (0xAE for sleep mode)
     spi_send_recv(0xAF);
+
+	display_update();
+	serial_printf("Display init finished!\n");
 }
 
 void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int invert_color) {
@@ -199,16 +211,25 @@ void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int 
             // Render each column
             column = x + c + i * 8;
             coldata = font[text[i] * 8 + c];
+
             for (row = y, r = 0; row < y + 8; row++, r++) {
                 // Render each row bit
-                bit = (coldata >> r) & 1;
                 offset = (row / 8) * DISPLAY_COLS + column;
-                if (invert_color)
-                    displaybuffer[offset] &= ~(bit << (row % 8));
-                else
+                
+				if (invert_color) {
+					bit = (coldata >> r) ^ 1;	
+                    displaybuffer[offset] ^= (bit << (row % 8));
+				}
+                
+				else {
+					bit = (coldata >> r) & 1;
                     displaybuffer[offset] |= bit << (row % 8);
-            }
-        }
+				}
+			}
+			if (i == 0) {
+			serial_printf("  colData (%d:%d): %x, displaybuffer: %x\n", y, c, coldata, displaybuffer[offset]);
+			}
+		}
     }
 }
 
@@ -221,9 +242,10 @@ void display_string_inverted(uint8_t x, uint8_t y, const char *text) {
 }
 
 void display_update(void) {
-    // page addr
-    size_t i, j;
-    for (i = 0; i < 4; i++) {
+    serial_printf("Display update is running\n");
+	// page addr
+    int i, j;
+    for (i = 0; i < 4; i++) {		
         DISPLAY_CHANGE_TO_COMMAND_MODE;
         spi_send_recv(0x22);
         spi_send_recv(i);
@@ -231,11 +253,13 @@ void display_update(void) {
         // start at left column
         spi_send_recv(0x00);
 
-        spi_send_recv(0x00);
+        spi_send_recv(0x10);
         // spi_send_recv(0x00);
 
         DISPLAY_CHANGE_TO_DATA_MODE;
-        for (j = 0; j < DISPLAY_COLS; j++)
+
+        for (j = 0; j < DISPLAY_COLS; j++) {
 			spi_send_recv(displaybuffer[i*DISPLAY_COLS + j]);
-    }
+		}
+	}
 }
