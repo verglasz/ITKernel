@@ -17,7 +17,11 @@ DEVICE		= 32MX340F512H
 # UART settings for programmer
 ifeq "$(shell hostname)" "helium"
 	TTYDEV		=/dev/ttyUSB0
+	PICOCOMMAND =picocom
+else ifeq "$(shell hostname)" "boron"
+	PICOCOMMAND =picocom
 else
+	PICOCOMMAND = NO_CUSTOM_BAUD=1 /mnt/c/Users/User/Desktop/picocom/picocom
 	TTYDEV		=/dev/ttyS3
 endif
 TTYBAUD		?=115200
@@ -87,7 +91,7 @@ clean:
 	$(RM) -rf $(DEPDIR)
 
 picocom:
-	picocom $(COM_FLAGS) --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
+	$(PICOCOMMAND) $(COM_FLAGS) --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
 
 sendelf_crc32:
 	gcc -Wall -Wextra -o helpers/sendelf_crc32 helpers/sendelf_crc32.c;

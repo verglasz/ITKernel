@@ -6,7 +6,7 @@
  * Oh, and there's no error checking. Better pass a correct
  * ELF file!
  */
-#include "../src/include/elf.h"
+#include "../utils/elf.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -99,3 +99,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+

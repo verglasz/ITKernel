@@ -70,6 +70,32 @@
       "-O2",
       "-c",
       "-o",
+      "build/itklibc/utils.c.o",
+      "itklibc/utils.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/programs",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/programs/itklibc/utils.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/programs/build/itklibc/utils.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "--sysroot=/opt/mcb32tools",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/itklibc/start.S.o",
       "itklibc/start.S"
     ],

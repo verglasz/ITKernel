@@ -38,10 +38,10 @@ static void init() {
     LED_DEBUG(LED_INIT_GPIO);
     setup_memory();
     LED_DEBUG(LED_INIT_MEM);
-    setup_peripherals();
-    LED_DEBUG(LED_INIT_PERIPH);
     setup_interrupts();
     LED_DEBUG(LED_INIT_INTS);
+    setup_peripherals();
+    LED_DEBUG(LED_INIT_PERIPH);
 }
 
 static void setup_gpio() {

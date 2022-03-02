@@ -1,6 +1,8 @@
 
 #include "eeprom.h"
 
+#include "delay.h"
+
 #define EEPROM_ADDR 0xA0
 #define EEPROM_PAGESIZE 64
 #define EEPROM_PAGEMASK (EEPROM_PAGESIZE - 1)
@@ -27,6 +29,7 @@ isize eeprom_write(u16 addr, u8 *data, u16 len) {
         } while (len > 0 && (addr & EEPROM_PAGEMASK)); // send bits up to page boundary
         i2c_stop();
         // we should wait for the write cycle to complete here (5ms)
+        delay(1e6);
     }
     return 0;
 }

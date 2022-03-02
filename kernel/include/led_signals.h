@@ -54,5 +54,6 @@
 
 #define LED_EXC		0xF0
 
+#define LED_U1RXINT	(LED_EXC | 0x1)
 #define LED_NMI		(LED_EXC | 0x7)
 
