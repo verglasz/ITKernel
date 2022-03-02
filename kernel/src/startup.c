@@ -1,3 +1,4 @@
+#include "display.h"
 #include "i2c.h"
 #include "interrupts.h"
 #include "kernel.h"
@@ -15,7 +16,7 @@ static void setup_peripherals();
 static void setup_interrupts();
 
 void _nmi_handler() {
-    PORTE = LED_SIGNMI;
+    LED_DEBUG(LED_NMI);
     for (;;) {}
 }
 
@@ -23,9 +24,8 @@ void _on_reset() {}
 void _on_bootstrap() {}
 
 void startup(void *stack_pointer) {
-    PORTE = LED_SIGBOOT;
+    LED_DEBUG(LED_BOOT);
     init();
-    PORTECLR = 0xff;
     enable_interrupts();
     kmain();
     for (;;) {}
@@ -72,12 +72,32 @@ static void setup_peripherals() {
     SYSKEY = 0x0;                        // Lock OSCCON
     i2c_setup();
     uart_setup();
+    display_init();
 }
 
 /* Configure cpu and interrupt controller
  * for vectored interrupts
  */
 static void setup_interrupts() {
+    // everything disabled
+    IEC(0) = 0;
+    IEC(1) = 0;
+    // every flag cleared
+    IFS(0) = 0;
+    IFS(1) = 0;
+    // priorities set to zero
+    IPC(0) = 0;
+    IPC(1) = 0;
+    IPC(2) = 0;
+    IPC(3) = 0;
+    IPC(4) = 0;
+    IPC(5) = 0;
+    IPC(6) = 0;
+    IPC(7) = 0;
+    IPC(8) = 0;
+    IPC(9) = 0;
+    IPC(10) = 0;
+    IPC(11) = 0;
     usize cause;
     __asm__("mfc0	%0, $13, 0" : "=r"(cause));        // read Cause register
     cause |= 0x00800000;                               // interrupts to special interrupt vectors

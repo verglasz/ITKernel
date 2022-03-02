@@ -18,6 +18,7 @@ setjmp:
 	sw	$s8, 11*4($a0)
 	addi	$v0, $zero, 0
 	jr	$ra
+	nop
 
 .global longjmp
 longjmp:
@@ -36,6 +37,7 @@ longjmp:
 	sw	$a1, 12*4($a0)
 	addi	$v0, $zero, 1
 	jr	$ra
+	nop
 
 .global eret_longjmp
 eret_longjmp:
@@ -51,12 +53,12 @@ eret_longjmp:
 	lw	$s6,  9*4($a0)
 	lw	$s7, 10*4($a0)
 	lw	$s8, 11*4($a0)
-	lw	$s8, 11*4($a1)
 	sw	$a1, 12*4($a0)
 	mfc0	$a1, $14, 0	// save epc in context
 	sw	$a1, 13*4($a0)
 	mtc0	$ra, $14, 0	// store return address in epc
 	addi	$v0, $zero, 1   // set return value
 	ehb
-	eret // jump back to return address, clearing stuff
+	eret // jump back to return address with eret, clearing stuff
+	nop
 
