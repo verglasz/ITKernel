@@ -31,7 +31,8 @@ PROVIDE(_min_heap_size = 0x800) ;
 MEMORY
 {
   exception_mem              : ORIGIN = 0x9D000000, LENGTH = 0x1000
-  kseg0_program_mem    (rx)  : ORIGIN = 0x9D001000, LENGTH = 0x7E000
+  kseg0_program_mem    (rx)  : ORIGIN = 0x9D001000, LENGTH = 0x6F000
+  kuseg_program_mem    (rx)  : ORIGIN = 0x9D070000, LENGTH = 0xF000 /* inserted kuseg program flash */
   kseg0_eeprom_mem           : ORIGIN = 0x9D07F000, LENGTH = 0x1000
   kseg0_boot_mem             : ORIGIN = 0x9FC00490, LENGTH = 0
   kseg1_boot_mem             : ORIGIN = 0xBFC00000, LENGTH = 0
@@ -41,6 +42,7 @@ MEMORY
   config1                    : ORIGIN = 0xBFC02FF8, LENGTH = 4
   config0                    : ORIGIN = 0xBFC02FFC, LENGTH = 4
   kseg1_data_mem       (w!x) : ORIGIN = 0xA0000000, LENGTH = 0x2000 /* from original 0x8000 */
+  /* not sure why whe're using kseg1 instead of kseg0... */
   sfrs                       : ORIGIN = 0xBF800000, LENGTH = 0x100000
   configsfrs                 : ORIGIN = 0xBFC02FF0, LENGTH = 0x10
 }
@@ -58,6 +60,7 @@ _BEV_EXCPT_ADDR         = 0xBFC00380;
 _DBG_EXCPT_ADDR         = 0xBFC00480;
 _DBG_CODE_ADDR          = ORIGIN(debug_exec_mem);
 
+_USER_ADDR				= ORIGIN(kuseg_program_mem);
 /*************************************************************************
  *  Bootloader program directives.
  *
@@ -129,6 +132,12 @@ SECTIONS
   {
     KEEP(*(.reset))
   } > kseg0_program_mem
+
+  /* User program section */
+  .usermode _USER_ADDR :
+  {
+	  KEEP(*(.usermode))
+  } > kuseg_program_mem
 }
 
 /* From here out every linker script is the same, so just include it */

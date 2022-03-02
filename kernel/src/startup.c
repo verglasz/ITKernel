@@ -1,10 +1,10 @@
 #include "i2c.h"
 #include "interrupts.h"
+#include "kernel.h"
 #include "led_signals.h"
 #include "serial_io.h"
 #include "types.h"
 #include "uart.h"
-#include "kernel.h"
 
 #include <pic32mx.h>
 
@@ -45,6 +45,7 @@ static void setup_gpio() {
 }
 
 static void setup_memory() {
+    // setup ram
     // Kernel data ram = 8KB
     BMXDKPBA = 8 * 1024;
     // Optional kernel program ram = 8 - 8 = 0 KB
@@ -52,6 +53,12 @@ static void setup_memory() {
     // User data ram = 20 - 8 = 12 KB
     BMXDUPBA = 20 * 1024;
     // User program ram = 32 - 20 = 12 KB
+    //
+    // setup flash
+    // we have 512kiB (0x80_000), some of it has special uses
+    // so let's just say last 0x10_000 (64k) are for user data and misc stuff
+    BMXPUPBA = 0x70000;
+    // all the rest is for the kernel
 }
 
 static void setup_peripherals() {
@@ -72,12 +79,11 @@ static void setup_peripherals() {
  */
 static void setup_interrupts() {
     usize cause;
-    __asm__("mfc0	%0, $13, 0" : "=r"(cause));       // read Cause register
-    cause |= 0x00800000;                              // interrupts to special interrupt vectors
-    __asm__("mtc0	%0, $13, 0\n" ::"r"(cause));      // write Cause register
-    __asm__("mtc0	%0, $12, 1\n" ::"r"(0x1 << 5));   // write IntCtl register (vector spacing)
-    __asm__("mtc0	%0, $15, 1\n" ::"r"(0x9d001000)); // write Ebase
+    __asm__("mfc0	%0, $13, 0" : "=r"(cause));        // read Cause register
+    cause |= 0x00800000;                               // interrupts to special interrupt vectors
+    __asm__("mtc0	%0, $13, 0\n" ::"r"(cause));       // write Cause register
+    __asm__("mtc0	%0, $12, 1\n" ::"r"(0x1 << 5));    // write IntCtl register (vector spacing)
+    __asm__("mtc0	%0, $15, 1\n" ::"r"(0x9d001000u)); // write Ebase
     __asm__("ehb");
     INTCON = PIC32_INTCON_MVEC | (0x4 << 16); // enable multi-vector and set vector spacing
 }
-

@@ -4,7 +4,6 @@
 #include "gpio.h"
 #include "kernel.h"
 #include "uart.h"
-/* #include "farcall.h" */
 
 void sys_exit(usize status) {
     set_kernel_mode();

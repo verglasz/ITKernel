@@ -39,7 +39,7 @@ void set_user_mode() {
 void kmain() {
     kernel_ctx.data = 0;
     kernel_ctx.epc = 0;
-    serial_printf("Hello from the other si... ITKernel\r\n");
+    serial_printf("Hello from the other si... ITKernel\n");
     isize ret = setjmp(&kernel_ctx);
     if (ret == 0) { // first return
         serial_printf("jump point set\n");
@@ -48,9 +48,9 @@ void kmain() {
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
     for (;;) {
-        serial_printf("Tell me something...\r\n");
+        serial_printf("Tell me something...\n");
         char linebuf[200];
         serial_gets_s(linebuf, 200);
-        serial_printf("I heard `%s`\r\n", linebuf);
+        serial_printf("I heard `%s`\n", linebuf);
     }
 }

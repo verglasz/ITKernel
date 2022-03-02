@@ -1,4 +1,6 @@
 
+# setjmp/longjmp
+
 .section .text
 .global setjmp
 setjmp:

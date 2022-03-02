@@ -10,6 +10,8 @@ extern Context kernel_ctx;
 
 void set_kernel_mode();
 void set_user_mode();
+__attribute__((noreturn))
+void usermode_jump(void (*jump_target)(void), usize * stack_pointer);
 
 /* longjmp to context ctx (from a previous setjmp),
  */
