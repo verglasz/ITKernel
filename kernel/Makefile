@@ -15,7 +15,7 @@ CPP=$(PREFIX)cpp
 DEVICE		= 32MX340F512H
 
 # UART settings for programmer
-TTYDEV		?=/dev/ttyUSB0
+TTYDEV		?=/dev/ttyS3
 TTYBAUD		?=115200
 
 # Name of the project
@@ -40,8 +40,8 @@ SOME_LIBS = $(TOOLCHAIN_INSTALL_DIR)/lib/proc
 MORE_LIBS = $(TOOLCHAIN_INSTALL_DIR)/lib
 ASFLAGS =
 CFLAGS = -march=mips32r2 -msoft-float -Wa,-msoft-float -G 0 -ffreestanding
-CFLAGS += --sysroot=$(TOOLCHAIN_INSTALL_DIR) -I$(C_INCLUDE_PATH) -I$(INCLUDEDIR)
-CFLAGS += -Wall -Wextra -Winline -std=gnu17
+CFLAGS += -I$(C_INCLUDE_PATH) -I$(INCLUDEDIR)
+CFLAGS += -Wall -Wextra -Winline -std=c99
 LDFLAGS = -T $(LINKSCRIPT) -L $(SOME_LIBS) -L $(MORE_LIBS) -lc
 
 # set NOOPT = 1 to disable optimization
