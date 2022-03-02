@@ -2,6 +2,7 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 //#include "mipslab.h"  /* Declatations for these labs */
 #include "display.h"  /* Declarations for this file. */
+#include "delay.h"
 
 // buffers
 uint8_t displaybuffer[DISPLAY_BUFFER_SIZE];
@@ -138,15 +139,6 @@ const uint8_t const font[] = {
 };
 
 
-/* quicksleep:
-   A simple function to create a small delay.
-   Very inefficient use of computing resources,
-   but very handy in some special cases. */
-void quicksleep(int cyc) {
-	int i;
-	for(i = cyc; i > 0; i--);
-}
-
 
 /* spi_send_recv:
 	Send data to the SPI2 bus
@@ -161,11 +153,30 @@ uint8_t spi_send_recv(uint8_t data) {
 	// Return buffer response.
 	return SPI2BUF;
 }
+
 void display_clear(void) {
     int i;
     for (i = 0; i < DISPLAY_BUFFER_SIZE; i++)
         displaybuffer[i] = 0;
 }
+
+static void spi2init(void) {
+
+    // Reset config and clear SPI buffer
+    SPI2CON = 0;
+    SPI2BUF = 0;
+
+	// Set Baud Rate Register to 4mhz
+    SPI2BRG = 4;
+
+	// Clear the overflow
+	SPI2STATCLR = 0x40;
+
+	// Enable the SPI2 in master mode
+	SPI2CONSET = 0x8020; 
+}
+
+
 
 void display_init(void) {
 	/*
@@ -182,17 +193,17 @@ void display_init(void) {
 	DISPLAY_CHANGE_TO_COMMAND_MODE;
 
 	// Startup sequence
-	quicksleep(100);
+	delay(100);
 	DISPLAY_ACTIVATE_VDD;
-	quicksleep(1000000);
+	delay(100000);
 	// Turn display off
 	spi_send_recv(0xAE);
 	
 	// Bring reset low, wait for driver to reset then turn reset high.
 	DISPLAY_ACTIVATE_RESET;
-	quicksleep(100);
+	delay(100);
 	DISPLAY_DO_NOT_RESET;
-	quicksleep(100);
+	delay(100);
 	// End of startup sequence
 
 	// Charge pump setting
@@ -206,7 +217,7 @@ void display_init(void) {
 
 
 	DISPLAY_ACTIVATE_VBAT;
-	quicksleep(1000000);
+	delay(100000);
 
 	// Sets the mapping to display data column adress (Put origin in top-left corner)
 	spi_send_recv(0xA1);

@@ -27,6 +27,9 @@ void startup(void *stack_pointer) {
     init();
     PORTECLR = 0xff;
     enable_interrupts();
+    
+    // to do: Add startup/init for display
+    
     kmain();
     for (;;) {}
 }
