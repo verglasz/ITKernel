@@ -20,12 +20,11 @@
 #define DISPLAY_TURN_OFF_VDD (PORTFSET = 0x40)
 #define DISPLAY_TURN_OFF_VBAT (PORTFSET = 0x20)
 
-//
-extern uint8_t displaybuffer[DISPLAY_BUFFER_SIZE]; // Declare memory for the display pixels to be written/read.
-extern uint8_t textbuffer[4][16]; // Declare textbuffer size.
-extern const uint8_t const font[128 * 8];
 
-void display_string(int line, char * s);
+extern uint8_t displaybuffer[DISPLAY_BUFFER_SIZE]; // Declare memory for the display pixels to be written/read.
+
+void display_string(uint8_t x, uint8_t y, const char *text);
+void display_string_inverted(uint8_t x, uint8_t y, const char *text);
 void display_update();
 void display_init();
 void spi2init();

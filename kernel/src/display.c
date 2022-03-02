@@ -1,5 +1,6 @@
 #include <pic32mx.h> /* Declarations of system-specific addresses etc */
 #include <stdint.h>  /* Declarations of uint_32 and the like */
+#include <string.h>  /* Import strlen */
 //#include "mipslab.h"  /* Declatations for these labs */
 #include "delay.h"
 #include "display.h" /* Declarations for this file. */
@@ -8,7 +9,6 @@
 
 // buffers
 u8 displaybuffer[DISPLAY_BUFFER_SIZE];
-u8 textbuffer[4][16];
 const u8 font[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -72,15 +72,13 @@ const u8 font[] = {
 u8 spi_send_recv(u8 data) {
     LED_DEBUG(LED_SPI_SENDREC_START);
     // Wait for buffer to be ready
-    while (!(SPI2STAT & 0x08))
-        ;
+    while (!(SPI2STAT & 0x08));
     LED_DEBUG(LED_SPI_PRESEND);
     // Put the data on the buffer
     SPI2BUF = data;
     LED_DEBUG(LED_SPI_SENT1);
     // Wait for buffer response.
-    while (!(SPI2STAT & 1))
-        ;
+    while (!(SPI2STAT & 1));
     LED_DEBUG(LED_SPI_PRERECV);
     // Return buffer response.
     u8 ret = SPI2BUF;
@@ -90,10 +88,16 @@ u8 spi_send_recv(u8 data) {
 
 void display_clear(void) {
     int i;
-    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) displaybuffer[i] = 0;
+    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) {
+		displaybuffer[i] = 0;
+	}	
 }
 
 void spi2init(void) {
+
+    // Disable interrupts for SPI2
+    IECCLR(1) = 0b111 << 5;
+
     // Reset config and clear SPI buffer
     SPI2CON = 0;
     SPI2BUF = 0;
@@ -102,13 +106,15 @@ void spi2init(void) {
     SPI2BRG = 4;
 
     // Clear the overflow
-    SPI2STATCLR = 0x40;
+    SPI2STATCLR = PIC32_SPISTAT_SPIROV;
 
-    // Enable the SPI2 in master mode
-    SPI2CONSET = 0x8020;
+    /* (Idle clock) Basic I/O Shield -> Display Example */
+    SPI2CONSET = PIC32_SPICON_CKP | PIC32_SPICON_MSTEN;
+    // Enable SPI
+    SPI2CONSET = PIC32_SPICON_ON;
 }
 
-void display_init(void) {
+void display_pins_init(void) {
     /*
     Vdd = RF6
     VBAT_en = RF5
@@ -121,10 +127,17 @@ void display_init(void) {
     TRISFCLR = (1 << 4) | (1 << 5) | (1 << 6); // RF4 to RF6 set to outputs
 
     // Set the reset pin
-    PORTDSET = (1 << 9); // RD9 (reset pin) set to high
-    TRISDCLR = (1 << 9); // RD9 set to output
+    PORTGSET = (1 << 9); // RG9 (reset pin) set to high
+    TRISDCLR = (1 << 9); // RG9 set to output
+}
 
-    /*
+
+void display_init(void) {
+    
+	spi2init();
+	display_pins_init();
+	
+	/*
     Power on sequence:
         1. Apply power to VDD.
         2. Send Display Off command.
@@ -139,16 +152,9 @@ void display_init(void) {
     // Startup sequence
     delay(100);
     DISPLAY_ACTIVATE_VDD;
-    delay(100000);
+    delay(100000000);
     // Turn display off
     spi_send_recv(0xAE);
-
-    // Bring reset low, wait for driver to reset then turn reset high.
-    DISPLAY_ACTIVATE_RESET;
-    delay(100);
-    DISPLAY_DO_NOT_RESET;
-    delay(100);
-    // End of startup sequence
 
     // Bring reset low, wait for driver to reset then turn reset high.
     DISPLAY_ACTIVATE_RESET;
@@ -167,7 +173,7 @@ void display_init(void) {
     spi_send_recv(0xF1);
 
     DISPLAY_ACTIVATE_VBAT;
-    delay(100000);
+    delay(100000000);
 
     // Sets the mapping to display data column adress (Put origin in top-left corner)
     spi_send_recv(0xA1);
@@ -178,67 +184,58 @@ void display_init(void) {
     // OLED config
     spi_send_recv(0x20);
 
-    // Turn on screen (normal mode) | (0xAE for sleep mode)
+    // Turn on screen (0xAF for normal mode) | (0xAE for sleep mode)
     spi_send_recv(0xAF);
 }
 
-void display_string(int line, char *s) {
-    int i;
-    if (line < 0 || line >= 4) return;
-    if (!s) return;
+void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int invert_color) {
+    size_t i, c, r, offset;
+    u8 row, column;
+    u8 coldata, bit;
 
-    for (i = 0; i < 16; i++)
-        if (*s) {
-            textbuffer[line][i] = *s;
-            s++;
-        } else
-            textbuffer[line][i] = ' ';
-}
-
-/*
-void display_image() {
-    int i, j;
-
-    for(i = 0; i < DISPLAY_PAGES; i++) {
-        DISPLAY_CHANGE_TO_COMMAND_MODE;
-
-        // Set which page we are drawing to
-        spi_send_recv(0x22);
-        spi_send_recv(i);
-
-        // Set lower column start address (L)
-        spi_send_recv(0);
-
-        // Set higher column start address (R)
-        spi_send_recv(0x0);
-
-        DISPLAY_CHANGE_TO_DATA_MODE;
-
-        for(j = 0; j < DISPLAY_COLS; j++) {
-            spi_send_recv(bufferimage[i * DISPLAY_COLS + j]);
+    for (i = 0; i < size; i++) {
+        // Render each character
+        for (c = 0; c < 8; c++) {
+            // Render each column
+            column = x + c + i * 8;
+            coldata = font[text[i] * 8 + c];
+            for (row = y, r = 0; row < y + 8; row++, r++) {
+                // Render each row bit
+                bit = (coldata >> r) & 1;
+                offset = (row / 8) * DISPLAY_COLS + column;
+                if (invert_color)
+                    displaybuffer[offset] &= ~(bit << (row % 8));
+                else
+                    displaybuffer[offset] |= bit << (row % 8);
+            }
         }
     }
-}*/
+}
+
+void display_string(uint8_t x, uint8_t y, const char *text) {
+    display_addstring(x, y, text, strlen(text), 0);
+}
+
+void display_string_inverted(uint8_t x, uint8_t y, const char *text) {
+    display_addstring(x, y, text, strlen(text), 1);
+}
 
 void display_update(void) {
-    LED_DEBUG(LED_DISPLAY_STARTFLUSH);
-    int i, j, k;
-    int c;
+    // page addr
+    size_t i, j;
     for (i = 0; i < 4; i++) {
         DISPLAY_CHANGE_TO_COMMAND_MODE;
         spi_send_recv(0x22);
         spi_send_recv(i);
 
-        spi_send_recv(0x0);
-        spi_send_recv(0x10);
+        // start at left column
+        spi_send_recv(0x00);
+
+        spi_send_recv(0x00);
+        // spi_send_recv(0x00);
 
         DISPLAY_CHANGE_TO_DATA_MODE;
-
-        for (j = 0; j < 16; j++) {
-            c = textbuffer[i][j];
-            if (c & 0x80) continue;
-
-            for (k = 0; k < 8; k++) spi_send_recv(font[c * 8 + k]);
-        }
+        for (j = 0; j < DISPLAY_COLS; j++)
+			spi_send_recv(displaybuffer[i*DISPLAY_COLS + j]);
     }
 }

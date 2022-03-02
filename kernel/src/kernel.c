@@ -1,6 +1,6 @@
 
 #include "kernel.h"
-
+#include "delay.h"
 #include "display.h"
 #include "eeprom.h"
 #include "led_signals.h"
@@ -54,11 +54,17 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
+    display_init();
+    display_string(0, 0, "Here be line 1!");
+    display_string(0, 8, "Here be line 2!");
+    display_string(0, 16, "Here be line 3!");
+    display_string(0, 24, "Here be line 4!");
 
-    display_string(0, "Test with text!");
     LED_DEBUG(LED_SCREEN_PRINT);
     display_update();
     LED_DEBUG(LED_SCREEN_FLUSH);
+        delay(100000000);
+
     serial_printf("In display textbuffer[0]: `%s`...\n", textbuffer[0]);
     u16 romaddr = 0x0;
     for (u8 i = 1;; i++) {
