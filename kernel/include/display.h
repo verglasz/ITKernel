@@ -28,4 +28,5 @@ extern const uint8_t const font[128 * 8];
 void display_string(int line, char * s);
 void display_update();
 void display_init();
+void spi2init();
 

@@ -1,6 +1,7 @@
 #include <pic32mx.h> /* Declarations of system-specific addresses etc */
 #include <stdint.h>  /* Declarations of uint_32 and the like */
 //#include "mipslab.h"  /* Declatations for these labs */
+#include "delay.h"
 #include "display.h" /* Declarations for this file. */
 #include "led_signals.h"
 #include "types.h"
@@ -65,20 +66,10 @@ const u8 font[] = {
     0,   0,   0,   4,   2,   4,   2,   0,   0,   0,   120, 68,  66,  68,  120, 0,   0,
 };
 
-/* quicksleep:
-   A simple function to create a small delay.
-   Very inefficient use of computing resources,
-   but very handy in some special cases. */
-void quicksleep(int cyc) {
-    int i;
-    for (i = cyc; i > 0; i--)
-        ;
-}
-
 /* spi_send_recv:
     Send data to the SPI2 bus
 */
-uint8_t spi_send_recv(uint8_t data) {
+u8 spi_send_recv(u8 data) {
     LED_DEBUG(LED_SPI_SENDREC_START);
     // Wait for buffer to be ready
     while (!(SPI2STAT & 0x08))
@@ -102,6 +93,21 @@ void display_clear(void) {
     for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) displaybuffer[i] = 0;
 }
 
+void spi2init(void) {
+    // Reset config and clear SPI buffer
+    SPI2CON = 0;
+    SPI2BUF = 0;
+
+    // Set Baud Rate Register to 4mhz
+    SPI2BRG = 4;
+
+    // Clear the overflow
+    SPI2STATCLR = 0x40;
+
+    // Enable the SPI2 in master mode
+    SPI2CONSET = 0x8020;
+}
+
 void display_init(void) {
     /*
     Power on sequence:
@@ -115,19 +121,25 @@ void display_init(void) {
     */
 
     DISPLAY_CHANGE_TO_COMMAND_MODE;
-
     // Startup sequence
-    quicksleep(100);
+    delay(100);
     DISPLAY_ACTIVATE_VDD;
-    quicksleep(1000000);
+    delay(100000);
     // Turn display off
     spi_send_recv(0xAE);
 
     // Bring reset low, wait for driver to reset then turn reset high.
     DISPLAY_ACTIVATE_RESET;
-    quicksleep(100);
+    delay(100);
     DISPLAY_DO_NOT_RESET;
-    quicksleep(100);
+    delay(100);
+    // End of startup sequence
+
+    // Bring reset low, wait for driver to reset then turn reset high.
+    DISPLAY_ACTIVATE_RESET;
+    delay(100);
+    DISPLAY_DO_NOT_RESET;
+    delay(100);
     // End of startup sequence
 
     // Charge pump setting
@@ -140,7 +152,7 @@ void display_init(void) {
     spi_send_recv(0xF1);
 
     DISPLAY_ACTIVATE_VBAT;
-    quicksleep(1000000);
+    delay(100000);
 
     // Sets the mapping to display data column adress (Put origin in top-left corner)
     spi_send_recv(0xA1);
@@ -215,4 +227,3 @@ void display_update(void) {
         }
     }
 }
-

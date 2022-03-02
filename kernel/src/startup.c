@@ -28,6 +28,7 @@ void startup(void *stack_pointer) {
     init();
     enable_interrupts();
     LED_DEBUG(LED_INIT_INTEN);
+    // to do: Add startup/init for display
     kmain();
     for (;;) {}
 }
@@ -79,7 +80,9 @@ static void setup_peripherals() {
     LED_DEBUG(LED_INIT_I2C);
     uart_setup();
     LED_DEBUG(LED_INIT_UART);
-    /* display_init(); */
+    spi2init();
+    LED_DEBUG(LED_INIT_SPI);
+    display_init();
     LED_DEBUG(LED_INIT_DISPL);
 }
 

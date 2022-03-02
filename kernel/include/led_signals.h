@@ -4,7 +4,8 @@
 #include <pic32mx.h>
 #include "delay.h"
 
-#define LED_DEBUG(code) do {PORTE = code; delay(1);}while(0)
+/* #define LED_DEBUG(code) do {PORTE = code; delay(1);}while(0) */
+#define LED_DEBUG(code) PORTE = code
 
 #define LED_STARTUP	0x10
 
