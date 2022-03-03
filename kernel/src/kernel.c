@@ -12,6 +12,8 @@
 #include "timers.h"
 #include "uart.h"
 
+#include "ui.h"
+
 struct context_t {
     usize sp;
     usize ra;
@@ -60,5 +62,9 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
-    test_elfload();
+    
+    //help_menu(); // Start at the help_menu that shows what each button does.
+    //test_menu();
+
+    main_menu();
 }
