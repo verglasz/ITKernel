@@ -1,4 +1,5 @@
 #include "syscalls.h"
+#include "timers.h"
 #include "types.h"
 #include "uart.h"
 
@@ -7,7 +8,11 @@
 void interrupt_handler(usize raw_irq_number) {
     if (IFS(0) & (1u << PIC32_IRQ_U1RX)) {
         // uart_handle_rx_int();
-        IFSCLR(0) = 1 << PIC32_IRQ_U1RX;
+        IFSCLR(0) = 1u << PIC32_IRQ_U1RX;
+    }
+    if (IFS(0) & (1u << PIC32_IRQ_T4)) {
+        timers_handle_t4();
+        IFSCLR(0) = 1u << PIC32_IRQ_T4;
     }
     return;
 }
