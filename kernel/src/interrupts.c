@@ -1,3 +1,4 @@
+#include "led_signals.h"
 #include "syscalls.h"
 #include "timers.h"
 #include "types.h"
@@ -6,6 +7,7 @@
 #include <pic32mx.h>
 
 void interrupt_handler(usize raw_irq_number) {
+    LED_DEBUG(LED_EXC);
     if (IFS(0) & (1u << PIC32_IRQ_U1RX)) {
         // uart_handle_rx_int();
         IFSCLR(0) = 1u << PIC32_IRQ_U1RX;

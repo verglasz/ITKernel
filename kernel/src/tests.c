@@ -219,9 +219,9 @@ void test_display_misc() {
 
 void test_sleep() {
     usize ms = 2358;
-    serial_printf("Global time: %ums", get_time());
+    serial_printf("Global time: %ums\n", get_time());
     serial_printf("Sleeping for %ums\n", ms);
     sleep(ms);
     serial_printf("Woke up!\n");
-    serial_printf("Global time: %ums", get_time());
+    serial_printf("Global time: %ums\n", get_time());
 }

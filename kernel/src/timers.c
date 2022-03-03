@@ -1,6 +1,8 @@
 
 #include "timers.h"
 
+#include "serial_io.h"
+
 #include <pic32mx.h>
 
 /* We use timer 4 as system timer,
@@ -23,6 +25,7 @@ void timers_handle_t4() {
 }
 
 void timers_setup() {
+    serial_printf("Initializing timers\n");
     // clear control registers
     T2CON = 0;
     T3CON = 0;
@@ -40,11 +43,14 @@ void timers_setup() {
     T2CONSET = 0x8;
 
     // set timer 4 timeout to 1ms
-    PR4 = TIMER_MS_WAIT;
+    PR4 = 100 * TIMER_MS_WAIT;
     // turn on timer 4
     T4CONSET = 0x8000;
-    // IECSET(0) = 1 << PIC32_IRQ_T4; // enable interrupts from timer 4
-    // IPCSET(4) = 0x4;
+
+    serial_printf("Enabling system timer interrupts\n");
+    // enable interrupts from timer 4
+    // IECSET(0) = 1 << PIC32_IRQ_T4;
+    IPCSET(4) = 0x4;
 }
 
 isize sleep(u32 millis) {

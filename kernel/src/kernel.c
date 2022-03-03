@@ -8,6 +8,8 @@
 #include "menu.h"
 #include "screensaver.h"
 #include "serial_io.h"
+#include "tests.h"
+#include "timers.h"
 #include "uart.h"
 
 struct context_t {
@@ -58,76 +60,5 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
-
-    /* ------------------------------------- Pretty Print ------------------------------------- */
-    // Line 1
-    display_string(0, 0, "ABCDEFG");
-
-    // Line 2
-    display_string(0, 8, "Inverted? No");
-
-    // Line 3
-    display_string_inverted(0, 16, "Inverted? Yes");
-
-    int p, q, count = 0;
-    for (p = 0; p < 9; p++) {
-        for (q = 0; q < 9; q++) {
-            if (q != count) {
-                display_string((u8)(q * 8), 24, "#");
-            } else {
-                display_string_inverted((u8)(q * 8), 24, "#");
-            }
-        }
-        count++;
-        display_update();
-        delay(2000000);
-    }
-    int MENU_LEN = 10;
-    const char *menuItems[] = {
-        "#0: SCRNSVR", "#1: INPUT", "#2: None",    "#3: None", "#4: INPUT",
-        "#5: None",    "#6: None",  "#7: SCRNSVR", "#8: None", "#9: INPUT"
-    };
-
-    display_menu(menuItems, MENU_LEN);
-
-    /* ---------------------------------------------------------------------------------------- */
-
-    LED_DEBUG(LED_SCREEN_PRINT);
-    display_update();
-    LED_DEBUG(LED_SCREEN_FLUSH);
-
-    u16 romaddr = 0x0;
-    for (u8 i = 1;; i++) {
-        serial_printf("Tell me something...\n");
-        LED_DEBUG(LED_WAIT_ECHO);
-        char linebuf[200];
-        usize read = serial_gets_s(linebuf, 200);
-        LED_DEBUG(LED_GOT_ECHO);
-        serial_printf("I heard `%s`\n", linebuf);
-        serial_printf("Writing it to the rom, %u bytes at addr 0x%x\n", read + 1, romaddr);
-        if (eeprom_write(romaddr, linebuf, read + 1) != 0) {
-            serial_printf("OOB write\n");
-            continue;
-        }
-        serial_printf("Written, now reading back\n");
-        char rombuf[200];
-        if (eeprom_read(romaddr, rombuf, read + 1) != 0) {
-            serial_printf("OOB read\n");
-            continue;
-        }
-        if (serial_printf("Read back `%s`\n", rombuf) < 0) {
-            serial_printf("Error formatting readback string \n");
-        }
-        romaddr += read;
-        if (i % 5 == 0) {
-            int scan = 0;
-            while (scan + 200 < romaddr) {
-                eeprom_read(scan, rombuf, 200);
-                uart_write_n(rombuf, 200);
-                scan += 200;
-            }
-            eeprom_read(scan, rombuf, romaddr - scan + 1);
-            serial_printf("%s\n", rombuf);
-        }
-    }
+    test_elfload();
 }

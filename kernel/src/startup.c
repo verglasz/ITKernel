@@ -4,6 +4,7 @@
 #include "kernel.h"
 #include "led_signals.h"
 #include "serial_io.h"
+#include "timers.h"
 #include "types.h"
 #include "uart.h"
 
@@ -26,6 +27,7 @@ void _on_bootstrap() {}
 void startup(void *stack_pointer) {
     LED_DEBUG(LED_BOOT);
     init();
+    serial_printf("Initialization complete, enabling interrupts globally\n");
     enable_interrupts();
     LED_DEBUG(LED_INIT_INTEN);
     // to do: Add startup/init for display
@@ -80,7 +82,8 @@ static void setup_peripherals() {
     LED_DEBUG(LED_INIT_I2C);
     uart_setup();
     LED_DEBUG(LED_INIT_UART);
-    LED_DEBUG(LED_INIT_SPI);
+    timers_setup();
+    LED_DEBUG(LED_INIT_TIMER);
     display_init();
     LED_DEBUG(LED_INIT_DISPL);
 }

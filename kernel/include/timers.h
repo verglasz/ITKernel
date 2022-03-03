@@ -4,6 +4,8 @@
 
 #define TIMER_MS_WAIT (625) // 5*5*5*5
 
+void timers_handle_t4();
+
 void timers_setup();
 
 isize sleep(u32 millis); // sleep for this amount of ms (maximum 6871947ms, >2hrs)
