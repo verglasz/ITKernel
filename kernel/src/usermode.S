@@ -14,6 +14,7 @@ usermode_jump:
 	sw	$ra, 4($sp)
 	addi	$s8, $sp, 0
 
+	# set usermode
 	mfc0	$t0, $12, 0
 	ori	$t0, $t0, 0x10
 	mtc0	$t0, $12, 0

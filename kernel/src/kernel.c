@@ -1,17 +1,14 @@
-#include <stdlib.h>
 #include "kernel.h"
+
 #include "delay.h"
-
 #include "display.h"
-#include "screensaver.h"
-#include "gpio.h"
-
 #include "eeprom.h"
+#include "gpio.h"
 #include "led_signals.h"
+#include "menu.h"
+#include "screensaver.h"
 #include "serial_io.h"
 #include "uart.h"
-
-#include "menu.h"
 
 struct context_t {
     usize sp;
@@ -40,6 +37,7 @@ void set_kernel_mode() {
 }
 
 void set_user_mode() {
+    // can't really call this since it's in kernel memory
     usize status;
     __asm__ __volatile__("mfc0	%0, $12, 0" : "=r"(status));
     status |= 0x10; // set UM bit
@@ -60,24 +58,23 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
-    
+
     /* ------------------------------------- Pretty Print ------------------------------------- */
     // Line 1
     display_string(0, 0, "ABCDEFG");
-    
+
     // Line 2
     display_string(0, 8, "Inverted? No");
-    
+
     // Line 3
     display_string_inverted(0, 16, "Inverted? Yes");
-    
+
     int p, q, count = 0;
     for (p = 0; p < 9; p++) {
         for (q = 0; q < 9; q++) {
-            if(q != count) {
+            if (q != count) {
                 display_string((u8)(q * 8), 24, "#");
-            }
-            else {
+            } else {
                 display_string_inverted((u8)(q * 8), 24, "#");
             }
         }
@@ -86,22 +83,12 @@ void kmain() {
         delay(2000000);
     }
     int MENU_LEN = 10;
-    const char * menuItems[] = {
-        "#0: SCRNSVR",
-        "#1: INPUT",
-        "#2: None",
-        "#3: None",
-        "#4: INPUT",
-        "#5: None",
-        "#6: None",
-        "#7: SCRNSVR",
-        "#8: None",
-        "#9: INPUT"
+    const char *menuItems[] = {
+        "#0: SCRNSVR", "#1: INPUT", "#2: None",    "#3: None", "#4: INPUT",
+        "#5: None",    "#6: None",  "#7: SCRNSVR", "#8: None", "#9: INPUT"
     };
 
-
     display_menu(menuItems, MENU_LEN);
-
 
     /* ---------------------------------------------------------------------------------------- */
 
