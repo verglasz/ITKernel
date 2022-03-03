@@ -1,6 +1,5 @@
-
 #include "tests.h"
-
+#include "timers.h"
 #include "display.h"
 #include "eeprom.h"
 #include "elf.h"
@@ -8,9 +7,11 @@
 #include "led_signals.h"
 #include "savefile.h"
 #include "serial_io.h"
-#include "timers.h"
 #include "uart.h"
 #include "usermode.h"
+#include "gpio.h"
+#include "screensaver.h"
+#include "types.h"
 
 #include <stddef.h>
 
@@ -197,7 +198,7 @@ void test_display_misc() {
         }
         count++;
         display_update();
-        delay(5000000);
+        sleep(200);
     }
 
     // Line 4
@@ -226,14 +227,60 @@ void test_sleep() {
     serial_printf("Global time: %ums\n", get_time());
 }
 
-
-
 void test_menu(void) {
-    int MENU_LEN = 10;
+    int MENU_LEN = 3;
     const char *menuItems[] = {
-        "#0: SCRNSVR", "#1: INPUT", "#2: None",    "#3: None", "#4: INPUT",
-        "#5: None",    "#6: None",  "#7: SCRNSVR", "#8: None", "#9: INPUT"
+        "#0: HELP", "#1: SCRNSVR", "#2: INPUT"
     };
+    help_menu(); // Start the display on the help menu
+    while (getsws() & 0x1) {
+        int resp = display_menu(menuItems, MENU_LEN);
 
-    int resp = display_menu(menuItems, MENU_LEN);
+        
+        if (resp == 0) {
+            help_menu();
+        }
+
+        if (resp == 1) {
+            screensaver();
+        }
+
+        if (resp == 2) {
+            get_input();
+        }
+    }
+    serial_printf("Exited the menu loop.");
+}
+
+void get_input(void) {
+    display_clear();
+    display_string(8, 12, "Awaiting input");
+    display_update();
+    serial_printf("Awaiting input for the display.\n");
+    char linebuf[200];
+    usize read = serial_gets_s(linebuf, 200);
+    
+    display_clear();
+    display_string(0, 0, "I recieved:");
+    display_string(0, 8, linebuf);
+    display_string(0, 24, "BTN4 to exit.");
+    display_update();
+
+    serial_printf("'%s' was sent to the display.\n", linebuf);
+    int exit = 1;
+    while (exit) {
+        if (getbtns() & 0x8) {
+            while(getbtns() & 0x8) {
+            }
+            break;
+        }
+    }
+}
+
+void test_syscall_display(void) {
+    
+    sys_screen_print(0, "Regular",  0x0);
+    sys_screen_print(1, "Regular", 0x0);
+    sys_screen_print(1, "Inverted", 0x1);
+    sys_screen_print(3, " ", 0x1);
 }

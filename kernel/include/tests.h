@@ -7,3 +7,5 @@ void test_savefile();
 void test_serial_rom_echo();
 void test_display_misc();
 
+
+void test_menu(void);
