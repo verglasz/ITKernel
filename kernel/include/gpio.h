@@ -9,6 +9,5 @@ static __inline__ u8 getsws() {
 }
 
 static __inline__ u8 getbtns() {
-	return (PORTD >> 4) & 0xE | PORTF & 0x1;
+	return ((PORTD >> 4) & 0xE) | ((PORTF >> 1) & 0x1);
 }
-

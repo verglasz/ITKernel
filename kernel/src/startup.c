@@ -48,7 +48,7 @@ static void init() {
 
 static void setup_gpio() {
     TRISECLR = 0xFF;  // LEDs as outputs
-    TRISFSET = 1;     // BTN1 as input
+    TRISFSET = 1 << 1;   // BTN1 as input
     TRISDSET = 0xFE0; // SW1-4 and BTN2-4 as inputs
 }
 

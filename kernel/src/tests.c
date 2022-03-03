@@ -225,3 +225,15 @@ void test_sleep() {
     serial_printf("Woke up!\n");
     serial_printf("Global time: %ums\n", get_time());
 }
+
+
+
+void test_menu(void) {
+    int MENU_LEN = 10;
+    const char *menuItems[] = {
+        "#0: SCRNSVR", "#1: INPUT", "#2: None",    "#3: None", "#4: INPUT",
+        "#5: None",    "#6: None",  "#7: SCRNSVR", "#8: None", "#9: INPUT"
+    };
+
+    int resp = display_menu(menuItems, MENU_LEN);
+}

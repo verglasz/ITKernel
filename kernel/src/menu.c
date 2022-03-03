@@ -3,14 +3,14 @@
 #include "serial_io.h"
 
 
-#include "delay.h"
+#include "timers.h"
 #include "display.h"
 #include "gpio.h"
 #include "types.h"
 #include "screensaver.h"
 
 
-void render_menu(char * menuItems[], int length, u8 selected) {
+void render_menu(char * menuItems[], int length, int selected) {
     
     display_clear();
     int k = 0;
@@ -24,56 +24,51 @@ void render_menu(char * menuItems[], int length, u8 selected) {
             display_string_inverted(0, (k * 8), menuItems[i]);
         }
     }
-
     display_update();
 }
 
-void display_menu(char * items[], int length) {
-    u8 selected = 0;
-    int run = 1;
-    int count = 0;
-    u8 consumed = 0x0;
+int display_menu(char * items[], int length) {
+    int selected = 0;
+    u8 consumed = 0x1;
 
 
-    while (run) {
-        if (count % 10 == 0) {
-            count = 0;
+    while (1) {
+
+        if (consumed & 0x1) {
             consumed = 0x0;
             render_menu(items, length, selected);
         }
-        
+              
         int btn = getbtns();
-        
-        if (btn & 0x2) {
-            if (selected == 0 || selected == 7) {
-                screensaver();
-                continue;
-            }
-            if (selected == 1 || selected == 4 || selected == 10) {
-                run = 0;
-                display_clear();
-                display_string(8, 12, "Awaiting input");
-                display_update();
-            }
 
+
+        if (btn & 0x1) {
+            while (getbtns() & 0x1) {
+            }
+            return (selected);
         }
         
-        if (btn & 0x4) {
-            if (consumed & 0x1) continue;
+        if (btn & 0x2) {
+            while (getbtns() & 0x2) {
+            }
             if (selected < length-1) {
-                consumed |= 0x1;
+                consumed = 0x1;
                 selected++;
             }
         }
         
-        if (btn & 0x8) {
-            if (consumed & 0x1) continue;
+        if (btn & 0x4) {
+            while (getbtns() & 0x4) {
+            }
             if (selected > 0) {
-                consumed |= 0x1;
+                consumed = 0x1;
                 selected--;
-                }
+            }
         }
-        count++;
+
+        if (btn & 0x8) {
+            return -1;
+        }
     }
 }
 
