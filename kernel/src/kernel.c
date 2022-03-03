@@ -55,9 +55,9 @@ void kmain() {
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
     display_string(0, 0, "ABCDEFG");
-    display_string(0, 8, "Inverted!");
-    display_string_inverted(0, 16, "Inverted!");
-    display_string(24, 24, "123456789");
+    display_string(0, 8, "Inverted? No");
+    display_string_inverted(0, 16, "Inverted? Yes");
+    display_string(0, 24, "123456789");
 
     LED_DEBUG(LED_SCREEN_PRINT);
     display_update();

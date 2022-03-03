@@ -196,38 +196,35 @@ void display_init(void) {
     // Turn on screen (0xAF for normal mode) | (0xAE for sleep mode)
     spi_send_recv(0xAF);
 
-	display_update();
 	serial_printf("Display init finished!\n");
 }
 
-void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int invert_color) {
+void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int invert) {
     size_t i, c, r, offset;
     u8 row, column;
-    u8 coldata, bit;
+    u8 columndata, bit;
 
     for (i = 0; i < size; i++) {
-        // Render each character
+        // Loop through each character
         for (c = 0; c < 8; c++) {
-            // Render each column
+            // loop through each column of the character
             column = x + c + i * 8;
-            coldata = font[text[i] * 8 + c];
-
-            for (row = y, r = 0; row < y + 8; row++, r++) {
-                // Render each row bit
-                offset = (row / 8) * DISPLAY_COLS + column;
-                
-				if (invert_color) {
-					bit = (coldata >> r) ^ 1;	
-                    displaybuffer[offset] ^= (bit << (row % 8));
-				}
-                
-				else {
-					bit = (coldata >> r) & 1;
-                    displaybuffer[offset] |= bit << (row % 8);
-				}
+            columndata = font[text[i] * 8 + c];
+			offset = (y / 8) * DISPLAY_COLS + column;
+			
+			if (invert) { // Set the background to be white if the inversion is enabled.
+				displaybuffer[offset] |= 0xff;
 			}
-			if (i == 0) {
-			serial_printf("  colData (%d:%d): %x, displaybuffer: %x\n", y, c, coldata, displaybuffer[offset]);
+            for (row = y, r = 0; row < y + 8; row++, r++) {
+                
+				bit = (columndata >> r) & 1;
+				
+				if (invert) {
+					displaybuffer[offset] &= ~(bit << (row % 8));
+				}
+				else {
+					displaybuffer[offset] |= (bit << (row % 8));
+				}
 			}
 		}
     }
