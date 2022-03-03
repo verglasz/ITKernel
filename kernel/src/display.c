@@ -205,18 +205,38 @@ void display_init(void) {
 	serial_printf("Display init finished!\n");
 }
 
-void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int invert) {
-    size_t i, c, r, offset;
-    u8 row, column;
+int display_addstring(uint8_t x, uint8_t y, const char *text, int invert) {
+    int c, r, offset;
+    u8 i = 0, row, column;
     u8 columndata, bit;
+    if (x > 127) {
+        serial_printf("x was greater than 127");
+        return -1;
+    }
+    if (((128 - x) / 8) < 1) {
+        serial_printf("There were not enough room to print characters: x\n");
+        return -1;
+    }
+    
+    if (((32 - y) / 8) < 1) {
+        serial_printf("There was not enough room to print character: y\n");
+        return -1;
+    }
 
-    for (i = 0; i < size; i++) {
+    while (text[i] != '\0') {
+
+        if (i > 15) {
+            serial_printf("String was too long (x). Cutting off at %d\n", i);
+            return -1;
+        }
+
         // Loop through each character
         for (c = 0; c < 8; c++) {
             // loop through each column of the character
             column = x + c + i * 8;
             columndata = font[text[i] * 8 + c];
 			offset = (y / 8) * DISPLAY_COLS + column;
+            
 			
 			if (!invert) { // Set the background to be white if the inversion is enabled.
 				displaybuffer[offset] &= 0;
@@ -237,15 +257,17 @@ void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int 
 				}
 			}
 		}
+    i++;
     }
+    return 0;
 }
 
 void display_string(uint8_t x, uint8_t y, const char *text) {
-    display_addstring(x, y, text, strlen(text), 0);
+    display_addstring(x, y, text, 0);
 }
 
 void display_string_inverted(uint8_t x, uint8_t y, const char *text) {
-    display_addstring(x, y, text, strlen(text), 1);
+    display_addstring(x, y, text, 1);
 }
 
 void display_update(void) {

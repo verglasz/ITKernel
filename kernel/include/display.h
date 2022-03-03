@@ -23,8 +23,11 @@
 
 extern uint8_t displaybuffer[DISPLAY_BUFFER_SIZE]; // Declare memory for the display pixels to be written/read.
 
+int display_addstring(uint8_t x, uint8_t y, const char *text, int invert);
+
 void display_string(uint8_t x, uint8_t y, const char *text);
 void display_string_inverted(uint8_t x, uint8_t y, const char *text);
+
 void display_update(void);
 void display_clear(void);
 void display_white(void);

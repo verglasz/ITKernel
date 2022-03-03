@@ -6,7 +6,8 @@
 #include "led_signals.h"
 #include "types.h"
 #include "serial_io.h"
-#include "gpio.h";
+#include "gpio.h"
+#include "timers.h"
 
 
 void screensaver(void) {
@@ -21,7 +22,7 @@ void screensaver(void) {
             xSpeed *= -1;
             x = 0;
         } 
-        if(y + 8 > 32) ySpeed *= -1;
+        if(y + 8 >= 32) ySpeed *= -1;
         if (y <= 0) { 
             ySpeed *= -1;
             y = 0;
@@ -39,6 +40,6 @@ void screensaver(void) {
             display_string(x , y, "Ding!");
         }
         display_update();
-        delay(200000);
+        sleep(50);
     }
 }
