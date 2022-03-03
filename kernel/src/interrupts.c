@@ -35,10 +35,13 @@ void syscall_handler(usize arg1, usize arg2, usize arg3, usize arg4) {
         sys_getbtns(arg2);
         break;
     case SYSCALL_SCREEN_PRINT:
-        sys_screen_print(arg1, arg2, arg3);
+        sys_screen_print(arg2, arg3, arg4);
         break;
     case SYSCALL_SERIAL_WRITE:
-        sys_serial_write(arg1, arg2);
+        sys_serial_write(arg2, arg3);
+        break;
+    case SYSCALL_SCREEN_CLEAR:
+        sys_screen_clear(arg2);
         break;
     default:
         break;
