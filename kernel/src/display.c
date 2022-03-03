@@ -215,7 +215,11 @@ void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int 
 			if (invert) { // Set the background to be white if the inversion is enabled.
 				displaybuffer[offset] |= 0xff;
 			}
-            for (row = y, r = 0; row < y + 8; row++, r++) {
+			else {
+				displaybuffer[offset] &= 0;
+			}
+
+            for (row = y, r = 0; row < y + 8; row++, r++) { // Add each pixel to the displaybuffer
                 
 				bit = (columndata >> r) & 1;
 				

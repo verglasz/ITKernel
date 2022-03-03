@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include "kernel.h"
 #include "delay.h"
 #include "display.h"
@@ -54,10 +54,43 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
+    
+    /* ------------------------------------- Pretty Print ------------------------------------- */
+    // Line 1
     display_string(0, 0, "ABCDEFG");
+    
+    // Line 2
     display_string(0, 8, "Inverted? No");
+    
+    // Line 3
     display_string_inverted(0, 16, "Inverted? Yes");
-    display_string(0, 24, "123456789");
+    
+    int p, q, count = 0;
+    for (p = 0; p < 9; p++) {
+        for (q = 0; q < 9; q++) {
+            if(q != count) {
+                display_string((u8)(q * 8), 24, "#");
+            }
+            else {
+                display_string_inverted((u8)(q * 8), 24, "#");
+            }
+        }
+        count++;
+        display_update();
+        delay(5000000);
+    }
+
+    // Line 4
+    display_string(0, 24, "1");
+    display_string_inverted(8, 24, "2");
+    display_string(16, 24, "3");
+    display_string_inverted(24, 24, "4");
+    display_string(32, 24, "5");
+    display_string_inverted(40, 24, "6");
+    display_string(48, 24, "7");
+    display_string_inverted(56, 24, "8");
+    display_string(64, 24, "9");
+    /* ---------------------------------------------------------------------------------------- */
 
     LED_DEBUG(LED_SCREEN_PRINT);
     display_update();
