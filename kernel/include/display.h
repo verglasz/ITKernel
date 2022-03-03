@@ -25,6 +25,8 @@ extern uint8_t displaybuffer[DISPLAY_BUFFER_SIZE]; // Declare memory for the dis
 
 void display_string(uint8_t x, uint8_t y, const char *text);
 void display_string_inverted(uint8_t x, uint8_t y, const char *text);
-void display_update();
-void display_init();
+void display_update(void);
+void display_clear(void);
+void display_white(void);
+void display_init(void);
 

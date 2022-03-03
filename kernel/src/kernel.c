@@ -1,11 +1,17 @@
 #include <stdlib.h>
 #include "kernel.h"
 #include "delay.h"
+
 #include "display.h"
+#include "screensaver.h"
+#include "gpio.h"
+
 #include "eeprom.h"
 #include "led_signals.h"
 #include "serial_io.h"
 #include "uart.h"
+
+#include "menu.h"
 
 struct context_t {
     usize sp;
@@ -77,19 +83,26 @@ void kmain() {
         }
         count++;
         display_update();
-        delay(5000000);
+        delay(2000000);
     }
+    int MENU_LEN = 10;
+    const char * menuItems[] = {
+        "#0: SCRNSVR",
+        "#1: INPUT",
+        "#2: None",
+        "#3: None",
+        "#4: INPUT",
+        "#5: None",
+        "#6: None",
+        "#7: SCRNSVR",
+        "#8: None",
+        "#9: INPUT"
+    };
 
-    // Line 4
-    display_string(0, 24, "1");
-    display_string_inverted(8, 24, "2");
-    display_string(16, 24, "3");
-    display_string_inverted(24, 24, "4");
-    display_string(32, 24, "5");
-    display_string_inverted(40, 24, "6");
-    display_string(48, 24, "7");
-    display_string_inverted(56, 24, "8");
-    display_string(64, 24, "9");
+
+    display_menu(menuItems, MENU_LEN);
+
+
     /* ---------------------------------------------------------------------------------------- */
 
     LED_DEBUG(LED_SCREEN_PRINT);

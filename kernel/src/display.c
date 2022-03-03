@@ -1,7 +1,6 @@
 #include <pic32mx.h> /* Declarations of system-specific addresses etc */
 #include <stdint.h>  /* Declarations of uint_32 and the like */
 #include <string.h>  /* Import strlen */
-//#include "mipslab.h"  /* Declatations for these labs */
 #include "delay.h"
 #include "display.h" /* Declarations for this file. */
 #include "led_signals.h"
@@ -92,6 +91,13 @@ void display_clear(void) {
     for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) {
 		displaybuffer[i] = 0;
 	}	
+}
+
+void display_white(void) {
+    int i;
+    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) {
+        displaybuffer[i] = 255;
+    }
 }
 
 void spi2init(void) {
@@ -212,18 +218,18 @@ void display_addstring(uint8_t x, uint8_t y, const char *text, size_t size, int 
             columndata = font[text[i] * 8 + c];
 			offset = (y / 8) * DISPLAY_COLS + column;
 			
-			if (invert) { // Set the background to be white if the inversion is enabled.
-				displaybuffer[offset] |= 0xff;
-			}
-			else {
+			if (!invert) { // Set the background to be white if the inversion is enabled.
 				displaybuffer[offset] &= 0;
 			}
 
             for (row = y, r = 0; row < y + 8; row++, r++) { // Add each pixel to the displaybuffer
                 
 				bit = (columndata >> r) & 1;
+                offset = (row / 8) * DISPLAY_COLS + column;
+                
 				
 				if (invert) {
+                    displaybuffer[offset] |= (1 << (row % 8));
 					displaybuffer[offset] &= ~(bit << (row % 8));
 				}
 				else {
@@ -243,7 +249,6 @@ void display_string_inverted(uint8_t x, uint8_t y, const char *text) {
 }
 
 void display_update(void) {
-    serial_printf("Display update is running\n");
 	// page addr
     int i, j;
     for (i = 0; i < 4; i++) {		
