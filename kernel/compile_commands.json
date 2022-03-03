@@ -92,6 +92,31 @@
       "-O2",
       "-c",
       "-o",
+      "build/elf.c.o",
+      "src/elf.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/elf.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/elf.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/gpio.c.o",
       "src/gpio.c"
     ],
@@ -192,6 +217,31 @@
       "-O2",
       "-c",
       "-o",
+      "build/savefile.c.o",
+      "src/savefile.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/savefile.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/savefile.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/serial_io.c.o",
       "src/serial_io.c"
     ],
@@ -273,6 +323,31 @@
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/uart.c",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/uart.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/ustar.c.o",
+      "src/ustar.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/ustar.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/ustar.c.o"
   },
   {
     "arguments": [
