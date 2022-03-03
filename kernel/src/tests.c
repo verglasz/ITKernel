@@ -3,7 +3,9 @@
 
 #include "eeprom.h"
 #include "elf.h"
+#include "savefile.h"
 #include "serial_io.h"
+#include "uart.h"
 #include "usermode.h"
 
 #include <stddef.h>
@@ -109,8 +111,25 @@ elf foo = {
 };
 
 void test_elfload() {
+    serial_printf("Testing elf load from file with builtin payload\n");
     eeprom_write(0x100, &foo, sizeof(foo));
+    serial_printf("Paylod written to rom\n");
     EntryPoint entry = elf_load_file(0x100);
+    serial_printf("Paylod loaded, entry point: %p\n", entry);
     if (entry == NULL) return;
+    serial_printf("Jumping into usermode!\n");
     usermode_jump(entry, USER_DATA_END - 0x10);
+    serial_printf("Uhh... this is weird, we returned from usermode_jump\n");
+}
+
+void test_savefile() {
+    u8 buffer[100];
+    serial_printf("Testing receive_and_store\n");
+    serial_printf("Send a little-endian (LSB first) size and then a file of that size\n");
+    isize sz = receive_and_store(0x10);
+    serial_printf("Stored file of size %d\n", sz);
+    serial_printf("Reading back first %d bytes...\n", sizeof(buffer));
+    eeprom_read(0x10, buffer, sizeof(buffer));
+    serial_printf("Here are bytes read:\n");
+    uart_write_n(buffer, sizeof(buffer));
 }
