@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define NULL 0
+
 typedef uintptr_t usize;
 typedef uint32_t u32;
 typedef uint16_t u16;
