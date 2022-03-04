@@ -12,6 +12,8 @@
 #include "gpio.h"
 #include "screensaver.h"
 #include "types.h"
+#include "animation.h"
+#include "ui.h"
 
 #include <stddef.h>
 
@@ -283,4 +285,10 @@ void test_syscall_display(void) {
     sys_screen_print(1, "Regular", 0x0);
     sys_screen_print(1, "Inverted", 0x1);
     sys_screen_print(3, " ", 0x1);
+}
+
+void test_animation(void) {
+    intro_animation();
+    sleep(5000);
+    main_menu();
 }
