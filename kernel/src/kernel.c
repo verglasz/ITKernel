@@ -11,7 +11,6 @@
 #include "tests.h"
 #include "timers.h"
 #include "uart.h"
-
 #include "ui.h"
 
 struct context_t {
@@ -60,11 +59,8 @@ void kmain() {
         serial_printf("jump point set\n");
     } else { // return from longjmp
         serial_printf(
-            "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
+            "returned from jump carrying %u, epc was 0x%x\n", kernel_ctx.data, kernel_ctx.epc);
     }
-    
-    //help_menu(); // Start at the help_menu that shows what each button does.
-    //test_menu();
 
     main_menu();
 }
