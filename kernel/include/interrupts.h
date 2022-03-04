@@ -1,6 +1,8 @@
 
 #pragma once
 
+extern volatile int magic;
+
 __inline__ static void enable_interrupts() {
 	__asm__("ei");
 	__asm__("ehb");
