@@ -217,7 +217,6 @@ int display_addstring(uint8_t x, uint8_t y, const char *text, int invert) {
         serial_printf("There were not enough room to print characters: x\n");
         return -1;
     }
-    
     if (((32 - y) / 8) < 1) {
         serial_printf("There was not enough room to print character: y\n");
         return -1;
