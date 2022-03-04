@@ -21,7 +21,7 @@ void intro_animation(void) {
     for (i = 0; i < 32; i++) {
         display_string(32, 12, name);
         draw_horizontal_line(i);
-        for (j = i * 128; j < (DISPLAY_COLS * DISPLAY_ROWS); j++) {
+        for (j = (i + 1) * 128; j < (DISPLAY_COLS * DISPLAY_ROWS); j++) {
             displaybuffer[j] &= 0;
         }
         display_update();
