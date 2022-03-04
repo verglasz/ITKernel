@@ -1,7 +1,3 @@
-
-/* Some code adapted from Wiktor Dobrosierdow's implementation
- */
-
 #include "ustar.h"
 
 #include "eeprom.h"
@@ -10,98 +6,89 @@
 #include "types.h"
 
 #define USTAR_BLOCK_SIZE 512
+#define USTAR_ADDR_MASK (~511)
 
-typedef union {
-    struct {
-        /* Pre-POSIX.1-1988 */
-        char filename[USTAR_FILENAME_SIZE];
-        char filemode[8];
-        char uid[8];
-        char gid[8];
-        char filesize[12];
-        char modtime[12];
-        char checksum[8];
-        /* UStar */
-        char type;
-        char linkname[100];
-        char ustar[6];
-        char version[2];
-        char owner[32];
-        char group[32];
-        char major[8];
-        char minor[8];
-        char prefix[155];
-    };
+typedef struct {
+    /* Pre-POSIX.1-1988 */
+    char filename[USTAR_FILENAME_SIZE];
+    char filemode[8];
+    char uid[8];
+    char gid[8];
+    char filesize[12];
+    char modtime[12];
+    char checksum[8];
+    /* Post-1988 UStar */
+    char type;
+    char linkname[100];
+    char ustar[6];
+    char version[2];
+    char owner[32];
+    char group[32];
+    char major[8];
+    char minor[8];
+    char prefix[155];
+} FileHeader;
 
-    /* Make sure this type is 512 bytes long (size of a block) */
-    char block[USTAR_BLOCK_SIZE];
-} UStar_Fhdr;
-
-/**
- * Convert an ASCII octal number into an integer.
+/* Get the value of an ASCII octal number
  */
-int oct2bin(const char *data, usize size) {
-    int n = 0;
-    while (size > 0) {
-        n *= 8;
-        n += *data - '0';
-        data++;
-        size--;
+int oct_atoi(const char *str) {
+    int val = 0;
+    while (*str != '\0') {
+        val *= 8;
+        val += *str - '0';
+        str++;
     }
-    return n;
+    return val;
 }
 
-/**
- * Find a file in the EEPROM containing a UStar filesystem (tar archive).
- * addr and size will not be modified unless a file is found.
- *
- * @param filename Filename.
- * @param addr File address on EEPROM (if found).
- * @param size File size on EEPROM (if found).
+/* Read the eeprom from address start_addr assuming it contains an ustar filesystem,
+ * scanning all files found and saving their info in buffer
+ * The filesystem MUST be aligned to the ustar blocksize (512, 0x200)
  */
-int ustar_find_file(u16 start_addr, const char *filename, u16 *addr, usize *size) {
-    UStar_Fhdr header;
-    usize tmpsize;
-    u16 curaddr;
-    for (curaddr = start_addr; curaddr < EEPROM_SIZE - USTAR_BLOCK_SIZE;) {
-        serial_printf("0x%x\n", curaddr);
-        isize rd = eeprom_read(curaddr, &header, USTAR_BLOCK_SIZE);
-        serial_printf("Read %d bytes\n", USTAR_BLOCK_SIZE);
-        // Make sure we are still in the filesystem
-        if (__builtin_memcmp(header.ustar, "ustar", 5)) {
+isize ustar_list_files(u16 start_addr, FileInfo *buffer, usize max_count) {
+    FileHeader fh;
+    usize filesize = 0;
+    u16 rom_addr = start_addr;
+    usize count = 0;
+    while (count < max_count && rom_addr < EEPROM_SIZE - USTAR_BLOCK_SIZE) {
+        isize ret = eeprom_read(rom_addr, &fh, sizeof(fh));
+        serial_printf(
+            "list_files: read %d bytes at addr 0x%x, "
+            "ret: %d\n",
+            sizeof(fh),
+            (usize)rom_addr,
+            ret);
+        if (ret != 0) return USTAR_READ_ERROR;
+        if (__builtin_memcmp(fh.ustar, "ustar", 5)) {
             char buf[6];
-            __builtin_memcpy(buf, header.ustar, 5);
+            __builtin_memcpy(buf, fh.ustar, 5);
             buf[5] = '\0';
-            serial_printf("Header wasn't `ustar`, found: %s", buf);
-            return USTAR_FILE_NOT_FOUND;
-        }
-
-        curaddr += USTAR_BLOCK_SIZE;
-        // FIXME: limit filename size to 99 (+ \0)
-        tmpsize = oct2bin(header.filesize, sizeof(header.filesize) - 1);
-        if (!__builtin_memcmp(header.filename, filename, __builtin_strlen(filename) + 1)) {
             serial_printf(
-                "file found! has filename %s, at addr 0x%x, has size %d\n",
-                header.filename,
-                (usize)curaddr,
-                tmpsize);
-            // File found
-            *addr = curaddr;
-            *size = tmpsize;
-            return 0;
+                "list_files: at addr 0x%x wasn't `ustar`, found: %s, stopping search\n",
+                rom_addr,
+                buf);
+            break;
         }
-
-        curaddr += tmpsize;
-        if (tmpsize % USTAR_BLOCK_SIZE) curaddr += USTAR_BLOCK_SIZE - (tmpsize % USTAR_BLOCK_SIZE);
+        filesize = oct_atoi(fh.filesize);
+        rom_addr += USTAR_BLOCK_SIZE;
+        serial_printf(
+            "list_files: file `%s` found at addr 0x%x, size %d\n",
+            fh.filename,
+            (usize)rom_addr,
+            filesize);
+        buffer[count].rom_addr = rom_addr;
+        buffer[count].size = filesize;
+        __builtin_memcpy(buffer[count].filename, fh.filename, USTAR_FILENAME_SIZE);
+        count++;
+        rom_addr += filesize;
+        if (rom_addr % USTAR_BLOCK_SIZE != 0) {
+            // skip rest of block (zeroes) and to go start of next
+            rom_addr = (rom_addr + USTAR_BLOCK_SIZE) & USTAR_ADDR_MASK;
+        }
     }
-    serial_printf("File not found, reached address 0x%x\n", curaddr);
-
-    return USTAR_FILE_NOT_FOUND;
+    return count;
 }
 
-/* Read the eeprom from address 0 assuming it contains an ustar filesystem,
- *
- */
-isize ustar_list_files(FileInfo *buffer, usize max_count) {
+int ustar_find_file(u16 start_addr, const char *filename, u16 *addr, usize *size) {
     return -1;
 }
