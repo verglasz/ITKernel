@@ -1,5 +1,8 @@
 #include "itklibc.h"
 
+
+int fib(int);
+
 int main(void) {
     int loop = 1;
     while (loop) {
@@ -7,7 +10,7 @@ int main(void) {
             int sws = getsws();
             int r = fib(sws);
             loop = 0;
-            char buf1[], buf2;
+            char buf1[30], buf2[30];
             sprintf(buf1, "Fibonacci for %d", sws);
             sprintf(buf2, "is: %d", r);
             screen_print(0, " ", 1);
@@ -30,7 +33,7 @@ int fib(int n) {
 
     int i, t1 = 0, t2 = 1;
     int nextTerm = t1 + t2;
-    
+
     for (i = 2; i <= n; i++) {
         nextTerm = t1 + t2;
         t1 = t2;
@@ -38,3 +41,4 @@ int fib(int n) {
     }
     return nextTerm;
 }
+

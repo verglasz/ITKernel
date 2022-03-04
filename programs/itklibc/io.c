@@ -1,6 +1,9 @@
 
 #include "itklibc.h"
 #include <stdarg.h>
+
+#ifndef NOIO
+
 #include <stdio.h>
 
 
@@ -26,4 +29,14 @@ isize serial_printf(const char *fmt, ...) {
 
     return written;
 }
+
+#else  // NOIO def'd
+
+ATTRIBUTE_PRINTF_(1)
+isize serial_printf(const char *fmt, ...) {
+	return -1;
+}
+
+
+#endif
 

@@ -28,6 +28,7 @@ INCLUDEDIR := include
 BUILDDIR := build
 PROGDIR := progs
 LIBDIR := itklibc
+FINALDIR := $(BUILDDIR)/run
 
 # File transfer program
 PICOCOM_SEND ?= ./utils/pysend.py
@@ -62,6 +63,8 @@ LIBFILES = $(wildcard $(LIBDIR)/*.c)
 ASLIBFILES = $(wildcard $(LIBDIR)/*.S)
 
 # Filenames
+RUNFILES := $(patsubst $(PROGDIR)/%.noio.c,$(FINALDIR)/%.run,$(PROGFILES))
+RUNFILES := $(patsubst $(PROGDIR)/%.c,$(FINALDIR)/%.run,$(RUNFILES))
 LEANFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.elf.stripped,$(PROGFILES))
 ELFFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.elf,$(PROGFILES))
 HEXFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.hex,$(PROGFILES))
@@ -70,27 +73,38 @@ HEXFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.hex,$(PROGFILES))
 OBJFILES =  $(patsubst $(LIBDIR)/%.c,$(BUILDDIR)/$(LIBDIR)/%.c.o,$(LIBFILES))
 OBJFILES +=  $(patsubst $(LIBDIR)/%.S,$(BUILDDIR)/$(LIBDIR)/%.S.o,$(ASLIBFILES))
 
+NOIOOBJS = $(patsubst $(BUILDDIR)/$(LIBDIR)/%.o,$(BUILDDIR)/$(LIBDIR)/%.noio.o,$(OBJFILES))
 
-.PHONY: all lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
+.PHONY: all noiolib lean lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
 .SUFFIXES:
 
 
-all: $(LEANFILES) progs
+all: $(RUNFILES) progs
+
+lean: $(LEANFILES)
 
 progs: $(ELFFILES)
 
 lib: $(OBJFILES)
 
+noiolib: $(NOIOOBJS)
+	echo $^
+
 stripcheck:
 	@sstrip --version > /dev/null
 
-progobjs: $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.o,$(PROGFILES))
+PROGOBJS = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.o,$(PROGFILES))
+
+progobjs: $(PROGOBJS)
 
 clean:
 	$(RM) -rf $(LEANFILES)
 	$(RM) -rf $(ELFFILES)
 	$(RM) -rf $(HEXFILES)
 	$(RM) -rf $(OBJFILES)
+	$(RM) -rf $(RUNFILES)
+	$(RM) -rf $(PROGOBJS)
+	$(RM) -rf $(NOIOOBJS)
 
 picocom: helpers
 	picocom $(COM_FLAGS) $(TTYDEV)
@@ -103,9 +117,18 @@ sendelf_crc32:
 sendtar_crc32:
 	gcc -Wall -Wextra -o utils/sendtar_crc32 utils/sendtar_crc32.c;
 
+$(FINALDIR)/fib.run: $(BUILDDIR)/fib.elf.stripped
+	cp $< $@
+
+$(FINALDIR)/%.run: $(BUILDDIR)/%.noio.elf.stripped
+	cp $< $@
+
 $(BUILDDIR)/%.elf.stripped: $(BUILDDIR)/%.elf | stripcheck
 	cp $< $@
 	sstrip $@
+
+$(BUILDDIR)/%.noio.elf: $(BUILDDIR)/%.noio.o $(NOIOOBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BUILDDIR)/%.elf: $(BUILDDIR)/%.o $(OBJFILES)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
@@ -116,8 +139,14 @@ $(BUILDDIR)/$(LIBDIR):
 $(BUILDDIR)/%.o: $(PROGDIR)/%.c | $(BUILDDIR)/$(LIBDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(BUILDDIR)/$(LIBDIR)/%.c.noio.o: $(LIBDIR)/%.c | $(BUILDDIR)/$(LIBDIR)
+	$(CC) $(CFLAGS) -c -o $@ $< -DNOIO
+
 $(BUILDDIR)/$(LIBDIR)/%.c.o: $(LIBDIR)/%.c | $(BUILDDIR)/$(LIBDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILDDIR)/$(LIBDIR)/%.S.noio.o: $(LIBDIR)/%.S | $(BUILDDIR)/$(LIBDIR)
+	$(CC) $(CFLAGS) $(ASFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/$(LIBDIR)/%.S.o: $(LIBDIR)/%.S | $(BUILDDIR)/$(LIBDIR)
 	$(CC) $(CFLAGS) $(ASFLAGS) -c -o $@ $<
