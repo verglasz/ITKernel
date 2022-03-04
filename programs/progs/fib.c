@@ -7,7 +7,7 @@ int main(void) {
             int sws = getsws();
             int r = fib(sws);
             loop = 0;
-            char buf1[], buf2
+            char buf1[], buf2;
             sprintf(buf1, "Fibonacci for %d", sws);
             sprintf(buf2, "is: %d", r);
             screen_print(0, " ", 1);
