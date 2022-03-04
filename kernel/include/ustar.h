@@ -12,5 +12,5 @@ typedef struct {
 	char filename[USTAR_FILENAME_SIZE];
 } FileInfo;
 
-int ustar_find_file(const char *filename, u16 *addr, usize *size);
+int ustar_find_file(u16 start_addr, const char *filename, u16 *addr, usize *size);
 

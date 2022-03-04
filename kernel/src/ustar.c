@@ -6,6 +6,7 @@
 
 #include "eeprom.h"
 #include "serial_io.h"
+#include "stdio.h"
 #include "types.h"
 
 #define USTAR_BLOCK_SIZE 512
@@ -58,20 +59,32 @@ int oct2bin(const char *data, usize size) {
  * @param addr File address on EEPROM (if found).
  * @param size File size on EEPROM (if found).
  */
-int ustar_find_file(const char *filename, u16 *addr, usize *size) {
+int ustar_find_file(u16 start_addr, const char *filename, u16 *addr, usize *size) {
     UStar_Fhdr header;
     usize tmpsize;
-    for (u16 curaddr = 0; curaddr < EEPROM_SIZE - USTAR_BLOCK_SIZE;) {
+    u16 curaddr;
+    for (curaddr = start_addr; curaddr < EEPROM_SIZE - USTAR_BLOCK_SIZE;) {
         serial_printf("0x%x\n", curaddr);
         isize rd = eeprom_read(curaddr, &header, USTAR_BLOCK_SIZE);
         serial_printf("Read %d bytes\n", USTAR_BLOCK_SIZE);
         // Make sure we are still in the filesystem
-        if (__builtin_memcmp(header.ustar, "ustar", 5)) return USTAR_FILE_NOT_FOUND;
+        if (__builtin_memcmp(header.ustar, "ustar", 5)) {
+            char buf[6];
+            __builtin_memcpy(buf, header.ustar, 5);
+            buf[5] = '\0';
+            serial_printf("Header wasn't `ustar`, found: %s", buf);
+            return USTAR_FILE_NOT_FOUND;
+        }
 
         curaddr += USTAR_BLOCK_SIZE;
         // FIXME: limit filename size to 99 (+ \0)
         tmpsize = oct2bin(header.filesize, sizeof(header.filesize) - 1);
         if (!__builtin_memcmp(header.filename, filename, __builtin_strlen(filename) + 1)) {
+            serial_printf(
+                "file found! has filename %s, at addr 0x%x, has size %d\n",
+                header.filename,
+                (usize)curaddr,
+                tmpsize);
             // File found
             *addr = curaddr;
             *size = tmpsize;
@@ -81,6 +94,7 @@ int ustar_find_file(const char *filename, u16 *addr, usize *size) {
         curaddr += tmpsize;
         if (tmpsize % USTAR_BLOCK_SIZE) curaddr += USTAR_BLOCK_SIZE - (tmpsize % USTAR_BLOCK_SIZE);
     }
+    serial_printf("File not found, reached address 0x%x\n", curaddr);
 
     return USTAR_FILE_NOT_FOUND;
 }
