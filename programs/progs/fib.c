@@ -6,23 +6,25 @@ int fib(int);
 int main(void) {
     int loop = 1;
     while (loop) {
-        if (getbtns() > 0) {
-            int sws = getsws();
-			loop = sws != 15;
-            int r = fib(sws);
-            loop = 0;
-            char buf1[30], buf2[30];
-            sprintf(buf1, "Fibonacci for %d", sws);
-            sprintf(buf2, "is: %d", r);
-            screen_print(0, " ", 1);
-            screen_print(1, buf1, 0);
-            screen_print(2, buf2, 0);
-            screen_print(3, " ", 1);
-            while (getbtns() > 0) {
-            }
-        }
-    }
-    while (getbtns() == 0) {
+        screen_clear(0x0);
+        screen_print(0, "Enter a number", 0x0);
+        screen_print(1, "Using the switches", 0x0);
+        screen_print(3, "Input 15 to exit", 0x0);
+        while (getbtns() ==  0) {}
+        while (getbtns() > 0) {}
+            
+        int sws = getsws();
+        loop = sws != 15;
+        int r = fib(sws);
+        char buf1[30], buf2[30];
+        sprintf(buf1, "Fibonacci for %d", sws);
+        sprintf(buf2, "is: %d", r);
+        screen_clear();
+        screen_print(1, buf1, 1);
+        screen_print(2, buf2, 1);
+
+        while (getbtns() ==  0) {}
+        while (getbtns() > 0) {}
     }
     return 0;
 }

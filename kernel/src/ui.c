@@ -15,7 +15,7 @@ int program_selector();
 
 void main_menu(void) {
     const char *const menuItems[] = {
-        "#0: HELP", "#1: SCRNSVR", "#2: INPUT", "#3: PROGRAMS", "#4: ANIMATION", "#5: LOAD",
+        "#0: HELP", "#1: SCRNSVR", "#2: INPUT", "#3: PROGRAMS", "#4: ANIMATION", "#5: LOAD"
     };
     serial_printf("main_menu: entering the help menu.\n");
     help_menu(); // Start the display on the help menu
