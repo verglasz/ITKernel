@@ -30,8 +30,12 @@ PROGDIR := progs
 LIBDIR := itklibc
 
 # File transfer program
+PICOCOM_SEND ?= ./utils/pysend.py
+PICOCOM_RECEIVE ?= ./utils/readserial.py
 # PICOCOM_FTP ?= utils/sendelf_crc32
 # PICOCOM_FTP ?= utils/sendtar_crc32
+#
+COM_FLAGS = -b 19200 --parity n --send-cmd $(PICOCOM_SEND) --receive-cmd $(PICOCOM_RECEIVE) --omap crlf --imap igncr,lfcrlf,spchex,8bithex # --emap nrmhex,spchex,8bithex --echo
 
 # Compiler and linker flags
 C_INCLUDE_PATH = "$(TOOLCHAIN_INSTALL_DIR)/include"
@@ -89,7 +93,7 @@ clean:
 	$(RM) -rf $(OBJFILES)
 
 picocom: helpers
-	picocom -b 19200 --parity n --send-cmd "$(PICOCOM_FTP)" $(TTYDEV)
+	picocom $(COM_FLAGS) $(TTYDEV)
 
 helpers: sendelf_crc32 sendtar_crc32
 
