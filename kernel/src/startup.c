@@ -30,6 +30,7 @@ void startup(void *stack_pointer) {
     serial_printf("Initialization complete, enabling interrupts globally\n");
     enable_interrupts();
     LED_DEBUG(LED_INIT_INTEN);
+    serial_printf("Interrupts enabled\n");
     // to do: Add startup/init for display
     kmain();
     for (;;) {}
@@ -63,9 +64,11 @@ static void setup_memory() {
     // User program ram = 32 - 20 = 12 KB
     //
     // setup flash
-    // we have 512kiB (0x80_000), some of it has special uses
-    // so let's just say last 0x10_000 (64k) are for user data and misc stuff
-    BMXPUPBA = 0x70000;
+    // // we have 512kiB (0x80_000), some of it has special uses
+    // // so let's just say last 0x10_000 (64k) are for user data and misc stuff
+    // the above was the oritinal plans but my tools are broken so fuck it,
+    // a very short program it is
+    BMXPUPBA = 0x09000;
     // all the rest is for the kernel
 }
 
@@ -116,7 +119,7 @@ static void setup_interrupts() {
     cause |= 0x00800000;                               // interrupts to special interrupt vectors
     __asm__("mtc0	%0, $13, 0\n" ::"r"(cause));       // write Cause register
     __asm__("mtc0	%0, $12, 1\n" ::"r"(0x1 << 5));    // write IntCtl register (vector spacing)
-    __asm__("mtc0	%0, $15, 1\n" ::"r"(0x9d001000u)); // write Ebase
+    __asm__("mtc0	%0, $15, 1\n" ::"r"(0x9d000000u)); // write Ebase
     __asm__("ehb");
     INTCON = PIC32_INTCON_MVEC | (0x4 << 16); // enable multi-vector and set vector spacing
 }
