@@ -63,8 +63,7 @@ void kmain() {
             "returned from jump carrying %u, epc was %p\n", kernel_ctx.data, kernel_ctx.epc);
     }
     
-    //help_menu(); // Start at the help_menu that shows what each button does.
-    //test_menu();
 
-    main_menu();
+    
+    test_animation();
 }
