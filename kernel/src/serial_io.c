@@ -1,6 +1,7 @@
 
 #include "serial_io.h"
 
+#include "interrupts.h"
 #include "uart.h"
 
 #include <stdio.h>
@@ -19,10 +20,12 @@ isize serial_printf(const char *fmt, ...) {
     va_list ap;
     isize written;
 
+    disable_interrupts();
     va_start(ap, fmt);
     written =
         __builtin_vsnprintf(buffer, PRINTF_BUFSIZE, fmt, ap); // thank god for builtin vsnprintf
     va_end(ap);
+    enable_interrupts();
 
     if (written < 0) return EFMT;
     if (written > PRINTF_BUFSIZE) return ENOSPACE;
