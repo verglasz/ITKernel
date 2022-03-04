@@ -19,6 +19,7 @@ ifeq "$(shell hostname)" "helium"
 	TTYDEV		=/dev/ttyUSB0
 	PICOCOMMAND =picocom
 else ifeq "$(shell hostname)" "boron"
+	TTYDEV		=/dev/ttyUSB0
 	PICOCOMMAND =picocom
 else
 	PICOCOMMAND = NO_CUSTOM_BAUD=1 /mnt/c/Users/User/Desktop/picocom/picocom
