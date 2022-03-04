@@ -20,6 +20,10 @@ void interrupt_handler(usize raw_irq_number) {
         timers_handle_t4();
         IFSCLR(0) = 1u << PIC32_IRQ_T4;
     }
+    if (IFS(0) & (1u << PIC32_IRQ_T3)) {
+        timers_handle_t3();
+        IFSCLR(0) = 1u << PIC32_IRQ_T3;
+    }
     LED_DEBUG(LED_INTRET);
     return;
 }

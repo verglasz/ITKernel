@@ -60,7 +60,7 @@ int run_file(FileInfo *f) {
     if (entry == NULL) return -1;
     if (setjmp(&kernel_ctx) == 0) {
         serial_printf("run_file: jumping to user program\n");
-        timers_setup_user_timeout(60 * TIMER_MS_WAIT * 1000);
+        timers_setup_user_timeout(120 * TIMER_MS_WAIT * 1000);
         usermode_jump(entry, (usize *)USER_DATA_END);
     } else {
         serial_printf("run_file: user program exited\n");

@@ -20,6 +20,13 @@
 
 volatile static u32 global_ms_count = 0;
 
+void timers_handle_t3() {
+    LED_DEBUG(LED_T3INT);
+    IECCLR(0) = PIC32_IRQ_T3;
+    T2CONCLR = 0x8000;
+    sys_exit(-2);
+}
+
 void timers_handle_t4() {
     LED_DEBUG(LED_T4INT);
     global_ms_count++;
@@ -52,6 +59,8 @@ void timers_setup() {
     // enable interrupts from timer 4
     IECSET(0) = 1u << PIC32_IRQ_T4;
     IPCSET(4) = 0x4;
+    // set priority for t3 too
+    IPCSET(3) = 0x4;
 }
 
 isize sleep(u32 millis) {
@@ -86,4 +95,18 @@ u32 get_time() {
     return global_ms_count;
 }
 
-void timers_setup_user_timeout(u32 timeout) {}
+void timers_setup_user_timeout(u32 timeout) {
+    T2CONCLR = 0x8000;
+    // zero timer
+    TMR2 = 0;
+    TMR3 = 0;
+    // load timeout value
+    PR2 = timeout & 0xffff;
+    PR3 = timeout >> 16;
+    // clear interrupt flag
+    IFSCLR(0) = 1u << PIC32_IRQ_T3;
+    // turn on timer
+    T2CONSET = 0x8000;
+    // enable timer interrupt
+    IECSET(0) = PIC32_IRQ_T3;
+}

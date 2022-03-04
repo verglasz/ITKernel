@@ -1,3 +1,4 @@
+#include "animation.h"
 #include "display.h"
 #include "elf.h"
 #include "gpio.h"
@@ -13,13 +14,13 @@
 int program_selector();
 
 void main_menu(void) {
-    int MENU_LEN = 8;
-    const char *menuItems[] = { "#0: HELP",      "#1: SCRNSVR", "#2: INPUT", "#3: PROGRAMS",
-                                "#4: animation", "#5: load",    "#6: None",  "#7: None" };
+    const char *const menuItems[] = {
+        "#0: HELP", "#1: SCRNSVR", "#2: INPUT", "#3: PROGRAMS", "#4: ANIMATION", "#5: LOAD",
+    };
     serial_printf("main_menu: entering the help menu.\n");
     help_menu(); // Start the display on the help menu
     while (1) {
-        int resp = display_menu(menuItems, MENU_LEN);
+        int resp = display_menu(menuItems, sizeof(menuItems));
 
         switch (resp) {
         case 0:

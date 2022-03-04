@@ -9,7 +9,7 @@ int draw_horizontal_line(u8 y) {
     u8 pixel = 1 << y % 8;
     for (int i = 0; i < DISPLAY_COLS; i++) {
         // maybe?
-        displaybuffer[DISPLAY_COLS * row + i] &= ~pixel;
+        displaybuffer[DISPLAY_COLS * row + i] |= pixel;
     }
     return 0;
 }
@@ -20,7 +20,7 @@ int clear_horizontal_line(u8 y) {
     u8 pixel = 1 << y % 8;
     for (int i = 0; i < DISPLAY_COLS; i++) {
         // maybe?
-        displaybuffer[DISPLAY_COLS * row + i] |= ~pixel;
+        displaybuffer[DISPLAY_COLS * row + i] &= ~pixel;
     }
     return 0;
 }
@@ -28,12 +28,12 @@ int clear_horizontal_line(u8 y) {
 void intro_animation(void) {
     char name[] = "ITKernel";
     int i;
-    display_clear();
+    display_white();
     display_update();
     for (i = 0; i < 32; i++) {
         display_string_inverted(32, 12, name);
-        draw_horizontal_line(i);
-        clear_horizontal_line(i + 1);
+        clear_horizontal_line(i);
+        draw_horizontal_line(i + 1);
         display_update();
         sleep(50);
     }

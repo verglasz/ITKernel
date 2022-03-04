@@ -1,15 +1,16 @@
-#include <pic32mx.h> /* Declarations of system-specific addresses etc */
-#include <stdint.h>  /* Declarations of uint_32 and the like */
-#include "serial_io.h"
-
-
-#include "timers.h"
 #include "display.h"
 #include "gpio.h"
-#include "types.h"
 #include "screensaver.h"
+#include "serial_io.h"
+#include "timers.h"
+#include "types.h"
 
-#define EVER ;;
+#include <pic32mx.h> /* Declarations of system-specific addresses etc */
+#include <stdint.h>  /* Declarations of uint_32 and the like */
+
+#define EVER \
+    ;        \
+    ;
 void help_menu(void) {
     display_clear();
     display_string(0, 0, "BTN1: SEL");
@@ -17,13 +18,10 @@ void help_menu(void) {
     display_string(0, 16, "BTN3: UP");
     display_string(0, 24, "BTN4: EXIT");
     display_update();
-    while (!(getbtns() & 0x8)) {
-
-    }
+    while (!(getbtns() & 0x8)) {}
 }
 
-void render_menu(char * menuItems[], int length, int selected) {
-
+void render_menu(const char *const menuItems[], int length, int selected) {
     display_clear();
 
     int modifier = 0;
@@ -38,13 +36,11 @@ void render_menu(char * menuItems[], int length, int selected) {
     for (k = 0; k < 4 && k < length; k++) {
         if (i + modifier != selected) {
             display_string(0, (k * 8), menuItems[i + modifier]);
-        }
-        else {
+        } else {
             display_string_inverted(0, (k * 8), menuItems[i + modifier]);
         }
         i++;
     }
-
 
     // int k = 0;
     // int i = (selected - 3);
@@ -65,13 +61,13 @@ void render_menu(char * menuItems[], int length, int selected) {
     @param char * items[] is a list of pointers to strings
     @param int length is the number of elements of the above list
 
-    Function will give you a menu you can traverse and will then return the index of the item that is selected.
+    Function will give you a menu you can traverse and will then return the index of the item that
+   is selected.
 
 */
-int display_menu(char * items[], int length) {
+int display_menu(const char *const items[], int length) {
     int selected = 0;
     u8 has_changed = 0x1;
-
 
     for (EVER) {
         if (has_changed & 0x1) {
@@ -81,16 +77,13 @@ int display_menu(char * items[], int length) {
 
         int btn = getbtns();
 
-
         if (btn & 0x1) {
-            while (getbtns() & 0x1) {
-            }
+            while (getbtns() & 0x1) {}
             return (selected);
         }
 
         if (btn & 0x2) {
-            while (getbtns() & 0x2) {
-            }
+            while (getbtns() & 0x2) {}
             if (selected < length - 1) {
                 has_changed = 0x1;
                 selected++;
@@ -98,17 +91,13 @@ int display_menu(char * items[], int length) {
         }
 
         if (btn & 0x4) {
-            while (getbtns() & 0x4) {
-            }
+            while (getbtns() & 0x4) {}
             if (selected > 0) {
                 has_changed = 0x1;
                 selected--;
             }
         }
 
-        if (btn & 0x8) {
-            return -1;
-        }
+        if (btn & 0x8) { return -1; }
     }
 }
-
