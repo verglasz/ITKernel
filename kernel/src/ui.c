@@ -1,3 +1,4 @@
+#include "animation.h"
 #include "display.h"
 #include "elf.h"
 #include "gpio.h"
@@ -21,13 +22,23 @@ void main_menu(void) {
     while (1) {
         int resp = display_menu(menuItems, MENU_LEN);
 
-        if (resp == 0) { help_menu(); }
-
-        if (resp == 1) { screensaver(); }
-
-        if (resp == 2) { test_get_input(); }
-
-        if (resp == 3) { program_selector(); }
+        switch (resp) {
+        case 0:
+            help_menu();
+            break;
+        case 1:
+            screensaver();
+            break;
+        case 2:
+            test_get_input();
+            break;
+        case 3:
+            program_selector();
+            break;
+        case 4:
+            intro_animation();
+            break;
+        }
     }
 }
 
