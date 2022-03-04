@@ -31,3 +31,5 @@ isize setjmp(Context * ctx);
 
 void kmain();
 
+int get_retval(Context *ctx);
+

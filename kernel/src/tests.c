@@ -345,8 +345,6 @@ elf foo = {
 };
 */
 
-static void get_input(void);
-
 void test_elfload() {
     serial_printf("Testing elf load from file with builtin payload\n");
     eeprom_write(0x100, &foo, sizeof(foo));
@@ -585,12 +583,12 @@ void test_menu(void) {
 
         if (resp == 1) { screensaver(); }
 
-        if (resp == 2) { get_input(); }
+        if (resp == 2) { test_get_input(); }
     }
     serial_printf("Exited the menu loop.");
 }
 
-void get_input(void) {
+void test_get_input(void) {
     display_clear();
     display_string(8, 12, "Awaiting input");
     display_update();
@@ -620,4 +618,3 @@ void test_syscall_display(void) {
     sys_screen_print(1, "Inverted", 0x1);
     sys_screen_print(3, " ", 0x1);
 }
-

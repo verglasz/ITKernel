@@ -13,4 +13,5 @@ typedef struct {
 } FileInfo;
 
 int ustar_find_file(u16 start_addr, const char *filename, u16 *addr, usize *size);
+isize ustar_list_files(FileInfo *buffer, usize max_count);
 

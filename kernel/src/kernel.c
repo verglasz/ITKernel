@@ -32,6 +32,10 @@ struct context_t {
 
 Context kernel_ctx;
 
+int get_retval(Context *ctx) {
+    return ctx->data & 0xffff;
+}
+
 void set_kernel_mode() {
     usize status;
     __asm__ __volatile__("mfc0	%0, $12, 0" : "=r"(status));

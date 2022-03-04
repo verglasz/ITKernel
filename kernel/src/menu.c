@@ -23,15 +23,14 @@ void help_menu(void) {
 }
 
 void render_menu(char * menuItems[], int length, int selected) {
-    
+
     display_clear();
 
     int modifier = 0;
     int i;
     if (selected < 3) {
         i = 0;
-    }
-    else {
+    } else {
         i = selected;
         modifier = -3;
     }
@@ -79,7 +78,7 @@ int display_menu(char * items[], int length) {
             has_changed = 0x0;
             render_menu(items, length, selected);
         }
-              
+
         int btn = getbtns();
 
 
@@ -88,7 +87,7 @@ int display_menu(char * items[], int length) {
             }
             return (selected);
         }
-        
+
         if (btn & 0x2) {
             while (getbtns() & 0x2) {
             }
@@ -97,7 +96,7 @@ int display_menu(char * items[], int length) {
                 selected++;
             }
         }
-        
+
         if (btn & 0x4) {
             while (getbtns() & 0x4) {
             }
@@ -112,7 +111,4 @@ int display_menu(char * items[], int length) {
         }
     }
 }
-
-
-
 

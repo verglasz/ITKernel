@@ -217,12 +217,62 @@
       "-O2",
       "-c",
       "-o",
+      "build/menu.c.o",
+      "src/menu.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/menu.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/menu.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
       "build/savefile.c.o",
       "src/savefile.c"
     ],
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/savefile.c",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/savefile.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/screensaver.c.o",
+      "src/screensaver.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/screensaver.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/screensaver.c.o"
   },
   {
     "arguments": [
@@ -373,6 +423,31 @@
     "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
     "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/uart.c",
     "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/uart.c.o"
+  },
+  {
+    "arguments": [
+      "/opt/mcb32tools/bin/mipsel-mcb32-elf-gcc",
+      "-march=mips32r2",
+      "-msoft-float",
+      "-Wa,-msoft-float",
+      "-G",
+      "0",
+      "-ffreestanding",
+      "-I/opt/mcb32tools/include",
+      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-Winline",
+      "-std=gnu17",
+      "-O2",
+      "-c",
+      "-o",
+      "build/ui.c.o",
+      "src/ui.c"
+    ],
+    "directory": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel",
+    "file": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/src/ui.c",
+    "output": "/home/verglasz/v/code/kth/dtek/dtek-group/project/kernel/build/ui.c.o"
   },
   {
     "arguments": [
