@@ -26,9 +26,7 @@
 .endm
 
 
-# ISR trampolines (asyncronous traps
-.global _isr_trampolines
-_isr_trampolines:
+# ISR trampolines (asyncronous traps)
 .set	i, 0
 .rept	64
 	isr_trampoline	%i
@@ -39,6 +37,7 @@ _isr_trampolines:
 # for explanation of "ax",@progbits see top of file
 .section .gen_handler,"ax",@progbits
 .ent _gen_exception
+.global _gen_exception
 _gen_exception:
 	mfc0	$k1, $13, 0	# read Cause register
 	andi	$k0, $k1, 0x7d	# mask out cause bits
@@ -67,6 +66,27 @@ _syscall:
 
 
 .section .text
+
+.align 4
+.global _cause_interrupt
+_cause_interrupt:
+	li	$k0, 1
+	mtc0	$ra, $14, 0
+	ehb
+	nop
+	nop
+	b	_trap_landing_pad
+	nop
+
+.global _cause_exception
+_cause_exception:
+	li	$k0, 0
+	mtc0	$ra, $14, 0
+	ehb
+	nop
+	b	_trap_landing_pad
+	nop
+
 .align 4
 .global _trap_landing_pad
 _trap_landing_pad:
