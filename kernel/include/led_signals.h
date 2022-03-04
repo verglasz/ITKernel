@@ -53,8 +53,16 @@
 #define LED_DISPLAY_STARTFLUSH	(LED_DISPLAY | 0x1)
 
 
-#define LED_EXC		0xF0
+#define LED_TRAP		0xE0
 
-#define LED_U1RXINT	(LED_EXC | 0x1)
-#define LED_NMI		(LED_EXC | 0x7)
+#define LED_INT		(LED_TRAP | 0x1)
+#define LED_SYS		(LED_TRAP | 0x2)
+#define LED_EXC		(LED_TRAP | 0x3)
+#define LED_U1RXINT	(LED_TRAP | 0x4)
+#define LED_T4INT	(LED_TRAP | 0x5)
+#define LED_T3INT	(LED_TRAP | 0x6)
+
+#define LED_INTRET	(LED_TRAP | 0x8)
+
+#define LED_NMI		(LED_TRAP | 0xe)
 
