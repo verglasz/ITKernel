@@ -5,10 +5,10 @@
 
 
 
-int draw_horizontal_line(u8 yPos) {
-    if (yPos > 31) return -1;
+int draw_horizontal_line(u8 y) {
+    if (y > 31) return -1;
     int i;
-    for (i = yPos * 128; y > 128 && y > (DISPLAY_COLS * DISPLAY_ROWS); i++) {
+    for (i = y * 128; y > 128 && y > (DISPLAY_COLS * DISPLAY_ROWS); i++) {
         displaybuffer[i] |= 1;
     }
     return 0;
@@ -28,3 +28,4 @@ void intro_animation(void) {
         sleep(50);
     }
 }
+
