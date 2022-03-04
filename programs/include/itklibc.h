@@ -2,8 +2,8 @@
 #pragma once
 #include "types.h"
 
-#define ATTRIBUTE_PRINTF_1 \
-    __attribute__((__format__(__printf__, 1, 2))) __attribute__((__nonnull__(1)))
+#define ATTRIBUTE_PRINTF_(n) \
+    __attribute__((__format__(__printf__, n, n+1))) __attribute__((__nonnull__(1)))
 
 void syscall(usize code, ...);
 
@@ -15,8 +15,10 @@ void screen_clear(usize flags)
 void serial_write(u8 *buffer, usize len);
 
 
-ATTRIBUTE_PRINTF_1
+ATTRIBUTE_PRINTF_(1)
 isize serial_printf(const char *fmt, ...);
 // intentionally not const-qualified
 isize sum(isize * vec, usize len);
+
+isize snprintf(char * buffer, usize size, const char *fmt, ...);
 
