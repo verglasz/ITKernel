@@ -14,3 +14,5 @@ void shortsleep(u32 units); // sleep for approximately units * 1.6us
 
 u32 get_time();
 
+void timers_setup_user_timeout(u32 timeout);
+

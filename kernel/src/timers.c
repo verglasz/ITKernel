@@ -85,3 +85,5 @@ void shortsleep(u32 units) {
 u32 get_time() {
     return global_ms_count;
 }
+
+void timers_setup_user_timeout(u32 timeout) {}

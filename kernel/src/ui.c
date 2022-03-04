@@ -54,25 +54,16 @@ int program_selector() {
     int selection = display_menu(fnames, ret);
     serial_printf("program_selector: selected %d\n", selection);
     if (selection == -1) return -1;
-    serial_printf("program_selector: loading elf\n");
-    EntryPoint entry = elf_load_file(fbuf[selection].rom_addr);
-    serial_printf("program_selector: elf loaded, entry: 0x%x\n", entry);
-    if (entry == NULL) return -2;
-    if (setjmp(&kernel_ctx) == 0) {
-        // fingers crossed
-        serial_printf("program_selector: jumping to user program\n");
-        usermode_jump(entry, USER_DATA_END);
-    } else {
-        serial_printf("program_selector: user program exited\n");
-        int retval = get_retval(&kernel_ctx);
-        display_clear();
-        char buf[24];
-        __builtin_sprintf(buf, "returned: %d", retval);
-        display_string(0, 0, "Program exited");
-        display_string(0, 8, buf);
-        display_update();
-        while (!getbtns()) {}
-        while (getbtns()) {}
-        return 0;
-    }
+    serial_printf("program_selector: running program\n");
+    int retval = run_file(&fbuf[selection]);
+    if (retval == -1) return -2;
+    display_clear();
+    char buf[24];
+    __builtin_sprintf(buf, "returned: %d", retval);
+    display_string(0, 0, "Program exited");
+    display_string(0, 8, buf);
+    display_update();
+    while (!getbtns()) {}
+    while (getbtns()) {}
+    return 0;
 }
