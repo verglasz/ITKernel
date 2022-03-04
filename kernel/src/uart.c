@@ -19,7 +19,7 @@ typedef enum {
     UART_ALL = UART_RX | UART_TX,
 } UartIrq;
 
-#define UART_BUFFER_SIZE 1024 // 1kiB
+#define UART_BUFFER_SIZE 1 // maybe 1kiB one day
 
 typedef struct {
     u16 head; // u16s to save space, since we know the buffer size will fit

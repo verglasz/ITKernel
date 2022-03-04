@@ -66,5 +66,12 @@ void kmain() {
             "returned from jump carrying %u, epc was 0x%x\n", kernel_ctx.data, kernel_ctx.epc);
     }
 
+    serial_printf("switches: %d\n", getsws());
+
     main_menu();
+    /* while (!getbtns()) {} */
+    /* if (getsws() == 0xe) { */
+    /*     test_savefile(); */
+    /* } else if (getsws() == 0x0) { */
+    /* } */
 }

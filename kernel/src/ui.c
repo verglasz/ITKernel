@@ -1,7 +1,9 @@
 #include "display.h"
 #include "elf.h"
+#include "gpio.h"
 #include "kernel.h"
 #include "menu.h"
+#include "screensaver.h"
 #include "serial_io.h"
 #include "tests.h"
 #include "usermode.h"
@@ -31,7 +33,7 @@ void main_menu(void) {
 
 int program_selector() {
     FileInfo fbuf[MAX_FILES];
-    isize ret = ustar_list_files(fbuf, MAX_FILES);
+    isize ret = ustar_list_files(0x0, fbuf, MAX_FILES);
     serial_printf("program_selector: ustar_list_files returned %d\n", ret);
     if (ret <= 0) { return -1; }
     char *fnames[MAX_FILES];
@@ -57,6 +59,9 @@ int program_selector() {
         __builtin_sprintf(buf, "returned: %d", retval);
         display_string(0, 0, "Program exited");
         display_string(0, 8, buf);
+        display_update();
+        while (!getbtns()) {}
+        while (getbtns()) {}
         return 0;
     }
 }
