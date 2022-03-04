@@ -1,11 +1,11 @@
-#include <pic32mx.h> /* Declarations of system-specific addresses etc */
-#include <stdint.h>  /* Declarations of uint_32 and the like */
-#include <string.h>  /* Import strlen */
-#include "delay.h"
 #include "display.h" /* Declarations for this file. */
+
+#include "delay.h"
 #include "led_signals.h"
-#include "types.h"
 #include "serial_io.h"
+#include "types.h"
+
+#include <pic32mx.h> /* Declarations of system-specific addresses etc */
 
 // buffers
 u8 displaybuffer[DISPLAY_BUFFER_SIZE];
@@ -72,13 +72,15 @@ const u8 font[] = {
 u8 spi_send_recv(u8 data) {
     LED_DEBUG(LED_SPI_SENDREC_START);
     // Wait for buffer to be ready
-    while (!(SPI2STAT & 0x08));
+    while (!(SPI2STAT & 0x08))
+        ;
     LED_DEBUG(LED_SPI_PRESEND);
     // Put the data on the buffer
     SPI2BUF = data;
     LED_DEBUG(LED_SPI_SENT1);
     // Wait for buffer response.
-    while (!(SPI2STAT & 1));
+    while (!(SPI2STAT & 1))
+        ;
     LED_DEBUG(LED_SPI_PRERECV);
     // Return buffer response.
     u8 ret = SPI2BUF;
@@ -88,20 +90,15 @@ u8 spi_send_recv(u8 data) {
 
 void display_clear(void) {
     int i;
-    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) {
-		displaybuffer[i] = 0;
-	}	
+    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) { displaybuffer[i] = 0; }
 }
 
 void display_white(void) {
     int i;
-    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) {
-        displaybuffer[i] = 255;
-    }
+    for (i = 0; i < DISPLAY_BUFFER_SIZE; i++) { displaybuffer[i] = 255; }
 }
 
 void spi2init(void) {
-
     // Disable interrupts for SPI2
     IECCLR(1) = 0b111 << 5;
 
@@ -138,21 +135,20 @@ void display_pins_init(void) {
     TRISGCLR = (1 << 9); // RG9 set to output
 }
 
-
 void display_init(void) {
-	serial_printf("Running display_init\n");
+    serial_printf("Running display_init\n");
 
     serial_printf("> Running spi2init\n");
-	spi2init();
+    spi2init();
 
-	serial_printf("> Running display_pins_init\n");
-	display_pins_init();
-	
-	serial_printf("> Clearing displaybuffer\n");
-	display_clear();
+    serial_printf("> Running display_pins_init\n");
+    display_pins_init();
 
-	serial_printf("> Running remaining of display_init\n");
-	/*
+    serial_printf("> Clearing displaybuffer\n");
+    display_clear();
+
+    serial_printf("> Running remaining of display_init\n");
+    /*
     Power on sequence:
         1. Apply power to VDD.
         2. Send Display Off command.
@@ -202,10 +198,10 @@ void display_init(void) {
     // Turn on screen (0xAF for normal mode) | (0xAE for sleep mode)
     spi_send_recv(0xAF);
 
-	serial_printf("Display init finished!\n");
+    serial_printf("Display init finished!\n");
 }
 
-int display_addstring(uint8_t x, uint8_t y, const char *text, int invert) {
+int display_addstring(u8 x, u8 y, const char *text, int invert) {
     int c, r, offset;
     u8 i = 0, row, column;
     u8 columndata, bit;
@@ -223,7 +219,6 @@ int display_addstring(uint8_t x, uint8_t y, const char *text, int invert) {
     }
 
     while (text[i] != '\0') {
-
         if (i > 15) {
             serial_printf("String was too long (x). Cutting off at %d\n", i);
             return -1;
@@ -234,45 +229,42 @@ int display_addstring(uint8_t x, uint8_t y, const char *text, int invert) {
             // loop through each column of the character
             column = x + c + i * 8;
             columndata = font[text[i] * 8 + c];
-			offset = (y / 8) * DISPLAY_COLS + column;
-            
-			
-			if (!invert) { // Set the background to be white if the inversion is enabled.
-				displaybuffer[offset] &= 0;
-			}
+            offset = (y / 8) * DISPLAY_COLS + column;
+
+            if (!invert) { // Set the background to be white if the inversion is enabled.
+                displaybuffer[offset] &= 0;
+            }
 
             for (row = y, r = 0; row < y + 8; row++, r++) { // Add each pixel to the displaybuffer
-                
-				bit = (columndata >> r) & 1;
+
+                bit = (columndata >> r) & 1;
                 offset = (row / 8) * DISPLAY_COLS + column;
-                
-				
-				if (invert) {
+
+                if (invert) {
                     displaybuffer[offset] |= (1 << (row % 8));
-					displaybuffer[offset] &= ~(bit << (row % 8));
-				}
-				else {
-					displaybuffer[offset] |= (bit << (row % 8));
-				}
-			}
-		}
-    i++;
+                    displaybuffer[offset] &= ~(bit << (row % 8));
+                } else {
+                    displaybuffer[offset] |= (bit << (row % 8));
+                }
+            }
+        }
+        i++;
     }
     return 0;
 }
 
-void display_string(uint8_t x, uint8_t y, const char *text) {
+void display_string(u8 x, u8 y, const char *text) {
     display_addstring(x, y, text, 0);
 }
 
-void display_string_inverted(uint8_t x, uint8_t y, const char *text) {
+void display_string_inverted(u8 x, u8 y, const char *text) {
     display_addstring(x, y, text, 1);
 }
 
 void display_update(void) {
-	// page addr
+    // page addr
     int i, j;
-    for (i = 0; i < 4; i++) {		
+    for (i = 0; i < 4; i++) {
         DISPLAY_CHANGE_TO_COMMAND_MODE;
         spi_send_recv(0x22);
         spi_send_recv(i);
@@ -285,8 +277,6 @@ void display_update(void) {
 
         DISPLAY_CHANGE_TO_DATA_MODE;
 
-        for (j = 0; j < DISPLAY_COLS; j++) {
-			spi_send_recv(displaybuffer[i*DISPLAY_COLS + j]);
-		}
-	}
+        for (j = 0; j < DISPLAY_COLS; j++) { spi_send_recv(displaybuffer[i * DISPLAY_COLS + j]); }
+    }
 }

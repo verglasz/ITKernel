@@ -20,19 +20,31 @@ void main_menu(void) {
     while (1) {
         int resp = display_menu(menuItems, MENU_LEN);
 
-        if (resp == 0) { help_menu(); serial_printf("main_menu: entering the help_menu.\n");}
+        if (resp == 0) {
+            help_menu();
+            serial_printf("main_menu: entering the help_menu.\n");
+        }
 
-        if (resp == 1) { screensaver(); serial_printf("main_menu: entering the screensaver.\n");}
+        if (resp == 1) {
+            screensaver();
+            serial_printf("main_menu: entering the screensaver.\n");
+        }
 
-        if (resp == 2) { test_get_input(); serial_printf("main_menu: entering the get_input.\n");}
+        if (resp == 2) {
+            test_get_input();
+            serial_printf("main_menu: entering the get_input.\n");
+        }
 
-        if (resp == 3) { program_selector(); serial_printf("main_menu: entering the program_selector.\n");}
+        if (resp == 3) {
+            program_selector();
+            serial_printf("main_menu: entering the program_selector.\n");
+        }
     }
 }
 
 int program_selector() {
     FileInfo fbuf[MAX_FILES];
-    isize ret = ustar_list_files(fbuf, MAX_FILES);
+    isize ret = ustar_list_files(0x0, fbuf, MAX_FILES);
     serial_printf("program_selector: ustar_list_files returned %d\n", ret);
     if (ret <= 0) { return -1; }
     char *fnames[MAX_FILES];

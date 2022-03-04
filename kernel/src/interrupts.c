@@ -26,7 +26,7 @@ void interrupt_handler(usize raw_irq_number) {
 
 void exception_handler(usize raw_cause) {
     LED_DEBUG(LED_EXC);
-    /* serial_printf("exception with cause register: 0x%x\n", raw_cause); */
+    serial_printf("exception with cause register: 0x%x\n", raw_cause);
     return;
 }
 
