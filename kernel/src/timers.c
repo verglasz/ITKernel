@@ -1,7 +1,7 @@
 
 #include "timers.h"
 
-#include "serial_io.h"
+#include "led_signals.h"
 
 #include <pic32mx.h>
 
@@ -21,6 +21,7 @@
 volatile static u32 global_ms_count = 0;
 
 void timers_handle_t4() {
+    LED_DEBUG(LED_T4INT);
     global_ms_count++;
 }
 
@@ -43,13 +44,13 @@ void timers_setup() {
     T2CONSET = 0x8;
 
     // set timer 4 timeout to 1ms
-    PR4 = 100 * TIMER_MS_WAIT;
+    PR4 = 1 * TIMER_MS_WAIT;
     // turn on timer 4
     T4CONSET = 0x8000;
 
     serial_printf("Enabling system timer interrupts\n");
     // enable interrupts from timer 4
-    // IECSET(0) = 1 << PIC32_IRQ_T4;
+    IECSET(0) = 1u << PIC32_IRQ_T4;
     IPCSET(4) = 0x4;
 }
 
