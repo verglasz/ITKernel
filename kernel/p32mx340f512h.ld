@@ -31,8 +31,8 @@ PROVIDE(_min_heap_size = 0x800) ;
 MEMORY
 {
   exception_mem              : ORIGIN = 0x9D000000, LENGTH = 0x1000
-  kseg0_program_mem    (rx)  : ORIGIN = 0x9D001000, LENGTH = 0x6F000
-  kuseg_program_mem    (rx)  : ORIGIN = 0x9D070000, LENGTH = 0xF000 /* inserted kuseg program flash */
+  kseg0_program_mem    (rx)  : ORIGIN = 0x9D001000, LENGTH = 0x0F000
+  kuseg_program_mem    (rx)  : ORIGIN = 0x7D009000, LENGTH = 0x81000 /* inserted kuseg program flash */
   kseg0_eeprom_mem           : ORIGIN = 0x9D07F000, LENGTH = 0x1000
   kseg0_boot_mem             : ORIGIN = 0x9FC00490, LENGTH = 0
   kseg1_boot_mem             : ORIGIN = 0xBFC00000, LENGTH = 0
