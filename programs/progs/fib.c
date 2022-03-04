@@ -8,6 +8,7 @@ int main(void) {
     while (loop) {
         if (getbtns() > 0) {
             int sws = getsws();
+			loop = sws != 15;
             int r = fib(sws);
             loop = 0;
             char buf1[30], buf2[30];

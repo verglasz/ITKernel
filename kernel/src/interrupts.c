@@ -27,6 +27,11 @@ void interrupt_handler(usize raw_irq_number) {
 void exception_handler(usize raw_cause) {
     LED_DEBUG(LED_EXC);
     serial_printf("exception with cause register: 0x%x\n", raw_cause);
+    usize epc;
+    __asm__("mfc0	%0, $14, 0" : "=r"(epc));
+    serial_printf("EPC: 0x%x\n", epc);
+    usize instr = *(volatile usize *)epc;
+    serial_printf("instr: 0x%x\n", instr);
     return;
 }
 

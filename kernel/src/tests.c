@@ -1,5 +1,6 @@
 #include "tests.h"
 
+#include "animation.h"
 #include "display.h"
 #include "eeprom.h"
 #include "elf.h"
@@ -14,13 +15,9 @@
 #include "timers.h"
 #include "types.h"
 #include "uart.h"
+#include "ui.h"
 #include "usermode.h"
 #include "ustar.h"
-#include "gpio.h"
-#include "screensaver.h"
-#include "types.h"
-#include "animation.h"
-#include "ui.h"
 
 #include <pic32mx.h>>
 
@@ -640,4 +637,3 @@ void test_animation(void) {
     sleep(5000);
     return;
 }
-

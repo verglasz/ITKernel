@@ -50,15 +50,20 @@ _syscall:
 #	addi	$k0, $sp, 0
 	# use kernel stack (syscalls always come from userspace)
 #	lw	$sp, kernel_sp
+	addi	$sp, $sp, 0x20
+	sw	$ra, 0xc($sp)
+
 	jal	syscall_handler
 	nop
+	lw	$ra, 0xc($sp)
 #	addi	$sp, $k0, 0	# restore user stack
 	mfc0	$k0, $14, 0	# advance instruction pointer (skip syscall)
 	addi	$k0, $k0, 4 # maybe we should check if we were in MIPS16e mode?
 	# i think it's also legal per misp spec to have syscall in a delay slot,
 	# but we just declare that we don't support user programs that do it
-	mtc0	$k0, $14, 0
+	mtc0	$ra, $14, 0
 	ehb	# actually eret shoud clear the hazards itself?
+	addi	$sp, $sp, -0x20
 	eret
 	nop
 
