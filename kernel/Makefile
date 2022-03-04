@@ -42,6 +42,7 @@ SOURCEDIR := src
 BUILDDIR := build
 
 # File transfer program
+PICOCOM_FTP ?= utils/send
 # PICOCOM_FTP ?= sendelf_crc32
 # PICOCOM_FTP ?= sendtar_crc32
 
@@ -82,7 +83,6 @@ df = $(DEPDIR)/$(*F)
 .SUFFIXES:
 
 all: $(HEXFILE)
-	echo "${HOST}"
 
 clean:
 	$(RM) helpers/sendelf_crc32
@@ -106,7 +106,8 @@ install: $(HEXFILE)
 	$(PREFIX)avrdude -V -p $(shell echo "$(DEVICE)" | tr '[:lower:]' '[:upper:]') -c stk500v2 -P "$(TTYDEV)" -b $(TTYBAUD) -U "flash:w:$(HEXFILE)"
 
 $(HEXFILE): $(ELFFILE)
-	$(PREFIX)bin2hex -a $(ELFFILE)
+	$(PREFIX)bin2hex -a $<
+	sed -f "fixhex.sed" -i $@
 
 $(ELFFILE): $(OBJFILES)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
