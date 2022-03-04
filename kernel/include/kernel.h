@@ -1,6 +1,7 @@
 
 #pragma once
 #include "types.h"
+#include "ustar.h"
 
 struct context_t;
 

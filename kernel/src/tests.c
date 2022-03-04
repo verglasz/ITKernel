@@ -638,6 +638,6 @@ void test_syscall_display(void) {
 void test_animation(void) {
     intro_animation();
     sleep(5000);
-    main_menu();
+    return;
 }
 

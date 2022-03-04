@@ -82,6 +82,6 @@ void kmain() {
         serial_printf(
             "returned from jump carrying %u, epc was 0x%x\n", kernel_ctx.data, kernel_ctx.epc);
     }
-
     test_animation();
+    main_menu();
 }
