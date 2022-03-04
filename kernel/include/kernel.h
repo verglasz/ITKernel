@@ -29,6 +29,7 @@ void eret_longjmp(Context * ctx, usize data);
 __attribute__((returns_twice))
 isize setjmp(Context * ctx);
 
+int run_file(FileInfo *f);
 void kmain();
 
 int get_retval(Context *ctx);

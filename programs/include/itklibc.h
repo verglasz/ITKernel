@@ -11,7 +11,7 @@ __attribute__((noreturn)) void exit(usize status);
 u8 getbtns();
 u8 getsws();
 void screen_print(usize line, char *str, usize flags);
-void screen_clear(usize flags)
+void screen_clear(usize flags);
 void serial_write(u8 *buffer, usize len);
 
 

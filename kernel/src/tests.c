@@ -10,11 +10,17 @@
 #include "savefile.h"
 #include "screensaver.h"
 #include "serial_io.h"
+#include "syscalls.h"
 #include "timers.h"
 #include "types.h"
 #include "uart.h"
 #include "usermode.h"
 #include "ustar.h"
+#include "gpio.h"
+#include "screensaver.h"
+#include "types.h"
+#include "animation.h"
+#include "ui.h"
 
 #include <pic32mx.h>>
 
@@ -360,7 +366,7 @@ void test_elfload() {
 
 void test_savefile() {
     u8 buffer[100];
-    u16 addr = 0x100;
+    u16 addr = 0x0;
     serial_printf("Testing receive_and_store\n");
     serial_printf("Send a little-endian (LSB first) size and then a file of that size\n");
     isize sz = receive_and_store(addr);
@@ -612,9 +618,26 @@ void test_get_input(void) {
     }
 }
 
+void test_listfiles() {
+    FileInfo files[20];
+    isize count = ustar_list_files(0x000, files, 20);
+    serial_printf("Found %d files:\n", count);
+    for (int i = 0; i < count; i++) {
+        //
+        serial_printf(" %d: %s\n", i, files[i].filename);
+    }
+}
+
 void test_syscall_display(void) {
     sys_screen_print(0, "Regular", 0x0);
     sys_screen_print(1, "Regular", 0x0);
     sys_screen_print(1, "Inverted", 0x1);
     sys_screen_print(3, " ", 0x1);
 }
+
+void test_animation(void) {
+    intro_animation();
+    sleep(5000);
+    main_menu();
+}
+

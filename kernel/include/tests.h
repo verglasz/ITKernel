@@ -14,6 +14,6 @@ void test_save_elf_run();
 void test_save_ustar_find();
 
 void test_get_input(void);
-
 void test_menu(void);
+void test_animation();
 

@@ -3,6 +3,7 @@
 #include "delay.h"
 #include "display.h"
 #include "eeprom.h"
+#include "elf.h"
 #include "gpio.h"
 #include "led_signals.h"
 #include "menu.h"
@@ -12,6 +13,8 @@
 #include "timers.h"
 #include "uart.h"
 #include "ui.h"
+#include "usermode.h"
+#include "ustar.h"
 
 struct context_t {
     usize sp;
@@ -51,6 +54,20 @@ void set_user_mode() {
     __asm__ __volatile__("mtc0	%0, $12, 0" : : "r"(status));
 }
 
+int run_file(FileInfo *f) {
+    EntryPoint entry = elf_load_file(f->rom_addr);
+    serial_printf("run_file: elf loaded, entry: 0x%x\n", (usize)entry);
+    if (entry == NULL) return -1;
+    if (setjmp(&kernel_ctx) == 0) {
+        serial_printf("run_file: jumping to user program\n");
+        timers_setup_user_timeout(60 * TIMER_MS_WAIT * 1000);
+        usermode_jump(entry, (usize *)USER_DATA_END);
+    } else {
+        serial_printf("run_file: user program exited\n");
+        return get_retval(&kernel_ctx) & 0xffff;
+    }
+}
+
 void kmain() {
     LED_DEBUG(LED_KMAIN);
     kernel_ctx.data = 0;
@@ -66,5 +83,5 @@ void kmain() {
             "returned from jump carrying %u, epc was 0x%x\n", kernel_ctx.data, kernel_ctx.epc);
     }
 
-    main_menu();
+    test_animation();
 }
