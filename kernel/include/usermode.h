@@ -10,6 +10,9 @@
   kuseg_program_mem    (rx)  : ORIGIN = 0x7F005000, LENGTH = 0x3000
 */
 
-__attribute__((noreturn))
+__attribute__((noreturn)) __attribute__((far))
 void usermode_jump(void (*jump_target)(void), usize * stack_pointer);
+
+__attribute__((noreturn)) __attribute__((far))
+void nonusermode_jump(void (*jump_target)(void), usize * stack_pointer);
 
