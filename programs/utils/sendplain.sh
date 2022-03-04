@@ -7,3 +7,5 @@ python3 -c "import sys; numb = ($size).to_bytes(4, byteorder='little'); sys.stdo
 
 cat "$filename"
 
+exit 1
+
