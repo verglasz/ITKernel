@@ -2,7 +2,8 @@
 
 import sys, os, time
 
-chunk = 64
+chunk = 64 # bytes to transfer at at time
+chunk_delay = 0.03 # delay between chunk transfers, in seconds
 
 fname = sys.argv[1]
 size = os.stat(fname).st_size
@@ -14,6 +15,6 @@ with open(fname, "rb") as f:
     while (len(bs) > 0):
         sys.stdout.buffer.write(bs)
         sys.stdout.flush()
-        time.sleep(0.3)
+        time.sleep(chunk_delay)
         bs = f.read(chunk)
 

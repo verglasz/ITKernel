@@ -18,12 +18,15 @@ DEVICE		= 32MX340F512H
 ifeq "$(shell hostname)" "helium"
 	TTYDEV		=/dev/ttyUSB0
 	PICOCOMMAND =picocom
+	SSTRIP 		=sstrip
 else ifeq "$(shell hostname)" "boron"
 	TTYDEV		=/dev/ttyUSB0
 	PICOCOMMAND =picocom
+	SSTRIP 		=sstrip
 else
 	PICOCOMMAND = NO_CUSTOM_BAUD=1 /mnt/c/Users/User/Desktop/picocom/picocom
 	TTYDEV		=/dev/ttyS3
+	SSTRIP 		=touch
 endif
 TTYBAUD		?=115200 # would be nice to use this for picocom as well, but not sure we can really take advantage of it
 
@@ -83,7 +86,7 @@ OBJFILES =  $(patsubst $(LIBDIR)/%.c,$(BUILDDIR)/$(LIBDIR)/%.c.o,$(LIBFILES))
 OBJFILES +=  $(patsubst $(LIBDIR)/%.S,$(BUILDDIR)/$(LIBDIR)/%.S.o,$(ASLIBFILES))
 NOIOOBJS = $(patsubst $(BUILDDIR)/$(LIBDIR)/%.o,$(BUILDDIR)/$(LIBDIR)/%.noio.o,$(OBJFILES))
 
-.PHONY: all noiolib lean lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
+.PHONY: all iolib noiolib lean lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
 .SUFFIXES:
 
 
@@ -96,7 +99,9 @@ lean: $(LEANFILES)
 
 progs: $(ELFFILES)
 
-lib: $(OBJFILES)
+lib: iolib noiolib
+
+iolib:$(OBJFILES)
 
 noiolib: $(NOIOOBJS)
 	echo $^
@@ -104,7 +109,7 @@ noiolib: $(NOIOOBJS)
 progobjs: $(PROGOBJS)
 
 stripcheck:
-	@sstrip --version > /dev/null
+	@(sstrip --version > /dev/null || (echo "ERROR: elfkickers's `sstrip` not installed!" && exit 1))
 
 clean:
 	$(RM) -rf $(PAYLOAD)
@@ -135,7 +140,7 @@ $(FINALDIR)/%.run: $(BUILDDIR)/%.noio.elf.stripped | $(FINALDIR)
 
 $(BUILDDIR)/%.elf.stripped: $(BUILDDIR)/%.elf | stripcheck
 	cp $< $@
-	sstrip $@
+	$(SSTRIP) $@
 
 $(BUILDDIR)/%.noio.elf: $(BUILDDIR)/%.noio.o $(NOIOOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
