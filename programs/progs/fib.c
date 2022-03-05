@@ -12,14 +12,14 @@ int main(void) {
         screen_print(3, "Input 15 to exit", 0x0);
         while (getbtns() ==  0) {}
         while (getbtns() > 0) {}
-            
+
         int sws = getsws();
         loop = sws != 15;
         int r = fib(sws);
         char buf1[30], buf2[30];
         sprintf(buf1, "Fibonacci for %d", sws);
         sprintf(buf2, "is: %d", r);
-        screen_clear();
+        screen_clear(0);
         screen_print(1, buf1, 1);
         screen_print(2, buf2, 1);
 
