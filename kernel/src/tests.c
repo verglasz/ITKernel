@@ -364,13 +364,18 @@ void test_elfload() {
 void test_savefile() {
     u8 buffer[100];
     u16 addr = 0x0;
-    serial_printf("Testing receive_and_store\n");
+    serial_printf("Using receive_and_store\n");
     serial_printf("Send a little-endian (LSB first) size and then a file of that size\n");
     isize sz = receive_and_store(addr);
     serial_printf("Stored file of size %d\n", sz);
-    serial_printf("Press button to read back file\n");
-    serial_printf("Here are the bytes read:\n");
-    while (getbtns() == 0) {}
+    serial_printf("Press button 4 to read back file, button 2 to quit\n");
+    serial_printf("(if you're reading back, start the receive program)\n");
+    u8 btns;
+    do {
+        btns = getbtns();
+        if (btns == 1 << 1) return;
+    } while (btns != 1 << 3);
+    uart_write_n(&sz, sizeof(sz));
     while (sz > sizeof(buffer)) {
         eeprom_read(addr, buffer, sizeof(buffer));
         uart_write_n(buffer, sizeof(buffer));
@@ -379,7 +384,6 @@ void test_savefile() {
     }
     eeprom_read(addr, buffer, sz);
     uart_write_n(buffer, sz);
-    while (getbtns() == 0) { PORTE = 0xff; }
 }
 
 void test_serial_rom_echo() {
