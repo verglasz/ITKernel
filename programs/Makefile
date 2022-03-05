@@ -15,12 +15,20 @@ CPP=$(PREFIX)cpp
 DEVICE		= 32MX340F512H
 
 # UART settings for programmer
-TTYDEV		?=/dev/ttyUSB0
-TTYBAUD		?=115200
+ifeq "$(shell hostname)" "helium"
+	TTYDEV		=/dev/ttyUSB0
+	PICOCOMMAND =picocom
+else ifeq "$(shell hostname)" "boron"
+	TTYDEV		=/dev/ttyUSB0
+	PICOCOMMAND =picocom
+else
+	PICOCOMMAND = NO_CUSTOM_BAUD=1 /mnt/c/Users/User/Desktop/picocom/picocom
+	TTYDEV		=/dev/ttyS3
+endif
+TTYBAUD		?=115200 # would be nice to use this for picocom as well, but not sure we can really take advantage of it
 
 # Linkscript
-# LINKSCRIPT	:= p$(shell echo "$(DEVICE)" | tr '[:upper:]' '[:lower:]').ld
-LINKSCRIPT := link.ld
+LINKSCRIPT := link.ld # lovingly handcrafted link script
 
 # Resources
 
@@ -33,9 +41,7 @@ FINALDIR := $(BUILDDIR)/run
 # File transfer program
 PICOCOM_SEND ?= ./utils/pysend.py
 PICOCOM_RECEIVE ?= ./utils/readserial.py
-# PICOCOM_FTP ?= utils/sendelf_crc32
-# PICOCOM_FTP ?= utils/sendtar_crc32
-#
+
 COM_FLAGS = -b 19200 --parity n --send-cmd $(PICOCOM_SEND) --receive-cmd $(PICOCOM_RECEIVE) --omap crlf --imap igncr,lfcrlf,spchex,8bithex # --emap nrmhex,spchex,8bithex --echo
 
 # Compiler and linker flags
@@ -63,23 +69,28 @@ LIBFILES = $(wildcard $(LIBDIR)/*.c)
 ASLIBFILES = $(wildcard $(LIBDIR)/*.S)
 
 # Filenames
+PAYLOAD := payload.ustar
 RUNFILES := $(patsubst $(PROGDIR)/%.noio.c,$(FINALDIR)/%.run,$(PROGFILES))
 RUNFILES := $(patsubst $(PROGDIR)/%.c,$(FINALDIR)/%.run,$(RUNFILES))
 LEANFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.elf.stripped,$(PROGFILES))
 ELFFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.elf,$(PROGFILES))
 HEXFILES = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.hex,$(PROGFILES))
 
+
+PROGOBJS = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.o,$(PROGFILES))
 # Object file names
 OBJFILES =  $(patsubst $(LIBDIR)/%.c,$(BUILDDIR)/$(LIBDIR)/%.c.o,$(LIBFILES))
 OBJFILES +=  $(patsubst $(LIBDIR)/%.S,$(BUILDDIR)/$(LIBDIR)/%.S.o,$(ASLIBFILES))
-
 NOIOOBJS = $(patsubst $(BUILDDIR)/$(LIBDIR)/%.o,$(BUILDDIR)/$(LIBDIR)/%.noio.o,$(OBJFILES))
 
 .PHONY: all noiolib lean lib progs helpers progobjs clean install stripcheck picocom sendelf_crc32 sendtar_crc32 disasm
 .SUFFIXES:
 
 
-all: $(RUNFILES) progs
+all: $(PAYLOAD)
+
+$(PAYLOAD): $(RUNFILES)
+	cd $(FINALDIR) && tar --create --file ../../$@ --format=ustar --record-size=1k $(patsubst $(FINALDIR)/%, %, $^)
 
 lean: $(LEANFILES)
 
@@ -90,14 +101,13 @@ lib: $(OBJFILES)
 noiolib: $(NOIOOBJS)
 	echo $^
 
+progobjs: $(PROGOBJS)
+
 stripcheck:
 	@sstrip --version > /dev/null
 
-PROGOBJS = $(patsubst $(PROGDIR)/%.c,$(BUILDDIR)/%.o,$(PROGFILES))
-
-progobjs: $(PROGOBJS)
-
 clean:
+	$(RM) -rf $(PAYLOAD)
 	$(RM) -rf $(LEANFILES)
 	$(RM) -rf $(ELFFILES)
 	$(RM) -rf $(HEXFILES)
@@ -120,7 +130,7 @@ sendtar_crc32:
 $(FINALDIR)/fib.run: $(BUILDDIR)/fib.elf.stripped
 	cp $< $@
 
-$(FINALDIR)/%.run: $(BUILDDIR)/%.noio.elf.stripped
+$(FINALDIR)/%.run: $(BUILDDIR)/%.noio.elf.stripped | $(FINALDIR)
 	cp $< $@
 
 $(BUILDDIR)/%.elf.stripped: $(BUILDDIR)/%.elf | stripcheck
@@ -132,6 +142,9 @@ $(BUILDDIR)/%.noio.elf: $(BUILDDIR)/%.noio.o $(NOIOOBJS)
 
 $(BUILDDIR)/%.elf: $(BUILDDIR)/%.o $(OBJFILES)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+$(FINALDIR):
+	mkdir -p $@
 
 $(BUILDDIR)/$(LIBDIR):
 	mkdir -p $@
